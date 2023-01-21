@@ -1,0 +1,105 @@
+Done by hand, answers
+highest: 53999995829399
+lowest: 11721151118175
+
+program is as a repeated section for each digit of input
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z alpha {1 or 26}
+add x beta
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y gamma
+mul y x
+add z y
+
+which can be resumed as
+starting with z and w (input digit)
+test = (z % 26 + beta) != w
+z /= alpha
+if test
+    z = 26*z + w + gamma
+
+notice that "z = 26*z + something"
+looks a lot a like building a number base 26, and the mod 26 above takes the last "digit"
+
+my input was in alpha, beta, gamma
+1   15  13
+1   10  16
+1   12  2
+1   10  8
+1   14  11
+26  -11 6
+1   10  12
+26  -16 2
+26  -9  2
+1   11  15
+26  -8  1
+26  -8  10
+26  -10 14
+26  -9  10
+
+alpha is only 1 and 26 meaning that z /= alpha is a shift right or nothing
+and we have 7 times 1 and 7 times 26
+
+alpha = 1, beta is positive
+alpha = 26, beta is negative
+
+input digits must be between 1 and 9 so   z % 26 + beta == w
+is false when beta >= 10
+
+when alpha = 1, beta >= 10
+code then becomes
+z = 26 * z + (w + gamma)
+shifting left by adding a 26it (10 is digit, 2 is bit, 26 is 26it) of (w + gamma)
+
+z is always shifted left for alpha = 1
+z is shifted right and maybe shifted left for alpha = 26
+if we want z = 0 at the end we need to shift right all the left shifts.
+so the 7 left-shift of alpha=1 must match with 7 right-shift of alpha=26
+meaning alpha=26 must not shift left anything extra (or we will always end up with z > 0)
+(side note: the 26bit we shift, w + gamma, is always positive.  w is [1,9] and gamma > 0 for my input)
+
+for alpha=26
+condition to shift-left  (z % 26 + beta != w) must be false
+
+for alpha=26
+(z % 26 + beta) = w
+z % 26 is the previous 26it we pushed
+previous 26it we pushed + current beta = current w
+the previous 26bit we pushed (alpha = 1) are in the form (w + gamma)
+
+my lines match:
+i to j => (w_j + gamma_j) + beta_i = w_i
+we know gamma and beta :)
+
+6 to 5
+8 to 7
+9 to 4
+11 to 10
+12 to 3
+13 to 2
+14 to 1
+
+
+which implies conditions
+w1 + 4 = w14
+w2 + 6 = w13
+w3 - 6 = w12
+w4 - 1 = w9
+w5 + 0 = w6
+w7 - 4 = w8
+w10 + 7 = w11
+
+knowing that w_i must be in [1,9] to be valid
+we can build the largest or smallest valid number by filling w_i in order with highest or lowest possible digit
