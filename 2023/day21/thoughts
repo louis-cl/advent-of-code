@@ -1,0 +1,52 @@
+input is square of side n
+borders are .
+straight from S are . (but not for sample)
+S is exactly in the middle
+
+reach in s steps => reach in s+2, never in s+1
+we care about the parity of any path
+
+zone explored is a diamond (l1 distance)
+
+shortest path from S to tile goes through borders
+8 cases depending on the first contact point
+since our input is 131x131 first contact is reached in even/odd steps (change at each zone)
+
+the frontier in each quadrant is covered by 2 diagonals of tiles, interior or exterior
+in a quadrant all the interior (or exterior) are the same case, because they are at the same distance
+so there are 2 cases x 4 quadrants + 4 straight line + full explored odd & even tiles = 14 cases
+
+how many of each ? how far does it go in straight line ?
+26501365 = 202300*131+65 so 202300 tiles + 65. 65 is distance between S to inside border of the tile
+So in 26591365 steps we reach the exact inside border 202300 tiles further
+because we do 202300 tiles, the last tiles in straight lines will be odd (even number of tiles)
+
+how many explored tiles ?
+if you look at the exploration after 2 steps (l1 circle of radius 2)
+there is a center 1 with odd state, then an englobing layer of even, then a layer of odd.
+if you look sideways the odd tiles form a 3x3 grid and the even a 2x2 grid.
+Seems like (n+1)^2 odd and n^2 even, which makes sense as #tiles is proportional to area
+
+the outer layer tiles are cut in a very similar ways.
+the cut side of the diamond has (n+1) tiles in the inner layer and (n) in the outer
+inner layer includes the last straight line tiles so they are odd, and they are 3/4 full approx.
+outer layer are even and smaller, 1/8 full approx.
+
+if we always count FULL tiles, the inner layer counts too much but the outer layer is not counted.
+if we know how many points are in those cuts, we can remove the inner and add the outer
+
+interestingly each diagonal has these corners, if we count all 4 sides those cuts can be joined (same parity)
+so it's like cutting all the corners (4) of a single tile. how many ? as many there are per side (n+1) odd and n even
+
+how many points are in those cuts ?
+If we think of a single tile where all the corners are cut, the part in the inside is what's reachable with 65 steps.
+So the cuts are the rest, either reacheable in odd or even position
+
+I need to know:
+- amount of points in odd&even fully explored tile
+- amount of points reachable in 65 steps & 64 steps
+given n = 202300, the total exploration is
+ (n+1)^2 fully explored odd tiles
++n^2 fully explored even tiles
+-(n+1) (fully explored odd - 65-steps explored)
++ n (fully explored even - 64-steps explored)
