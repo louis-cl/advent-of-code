@@ -29,7 +29,7 @@ const Step = Build.Step;
 const Allocator = std.mem.Allocator;
 const print = std.debug.print;
 
-var YEAR: []const u8 = "2023";
+var YEAR: []const u8 = "2024";
 var DAY: []const u8 = undefined;
 const INPUT_DIR = "input";
 const SRC_DIR = "src";
