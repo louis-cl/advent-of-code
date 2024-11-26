@@ -138,12 +138,9 @@ fn generateSourceFileIfNotPresent(allocator: Allocator) !void {
             \\}
             \\
             \\test "it should do nothing" {
-            \\    const allocator = std.testing.allocator;
-            \\    const input = "";
-            \\
             \\    const problem: @This() = .{
-            \\        .input = input,
-            \\        .allocator = allocator,
+            \\        .input = "",
+            \\        .allocator = std.testing.allocator,
             \\    };
             \\
             \\    try std.testing.expectEqual(null, try problem.part1());
