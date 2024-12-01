@@ -47,29 +47,31 @@ pub fn solve(this: *const @This()) !Solution {
     return Solution{ .p1 = total, .p2 = sim };
 }
 
-// test "it does p1 one line" {
-//     const problem: @This() = .{
-//         .input = "3   4\n",
-//         .allocator = std.testing.allocator,
-//     };
+test "it does p1 one line" {
+    const problem: @This() = .{
+        .input = "3   4\n",
+        .allocator = std.testing.allocator,
+    };
+    const sol = try problem.solve();
 
-//     try std.testing.expectEqual(1, try problem.part1());
-// }
+    try std.testing.expectEqual(1, sol.p1);
+}
 
-// test "p2 sample" {
-//     const input =
-//         \\3   4
-//         \\4   3
-//         \\2   5
-//         \\1   3
-//         \\3   9
-//         \\3   3
-//         \\
-//     ;
-//     const problem: @This() = .{
-//         .input = input,
-//         .allocator = std.testing.allocator,
-//     };
-
-//     try std.testing.expectEqual(31, try problem.part2());
-// }
+test "sample" {
+    const input =
+        \\3   4
+        \\4   3
+        \\2   5
+        \\1   3
+        \\3   9
+        \\3   3
+        \\
+    ;
+    const problem: @This() = .{
+        .input = input,
+        .allocator = std.testing.allocator,
+    };
+    const sol = try problem.solve();
+    try std.testing.expectEqual(11, sol.p1);
+    try std.testing.expectEqual(31, sol.p2);
+}

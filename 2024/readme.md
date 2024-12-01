@@ -24,6 +24,10 @@ Data can be reused between part1 and part2.
 
 # Performance results
 
-Day 1 commit 7998070:
+## Day 1
+commit 7998070:
   Time (mean ± σ):       1.7 ms ±   0.3 ms    [User: 0.8 ms, System: 0.6 ms]
   Range (min … max):     0.9 ms …   2.4 ms    2075 runs
+commit 2d45ea0: run part1 and part2 in one go
+  Time (mean ± σ):       1.6 ms ±   0.3 ms    [User: 0.7 ms, System: 0.6 ms]
+  Range (min … max):     0.8 ms …   2.6 ms    2145 runs
