@@ -28,8 +28,33 @@ pub fn part1(this: *const @This()) !?i64 {
 }
 
 pub fn part2(this: *const @This()) !?i64 {
-    _ = this;
-    return null;
+    var line_it = mem.splitScalar(u8, this.input, '\n');
+
+    var left_nums = std.AutoHashMap(i32, i32).init(this.allocator);
+    defer left_nums.deinit();
+
+    var right = std.ArrayList(i32).init(this.allocator);
+    defer right.deinit();
+
+    while (line_it.next()) |line| {
+        if (line.len == 0) continue;
+        var number_it = mem.splitSequence(u8, line, "   ");
+
+        const l = try std.fmt.parseInt(i32, number_it.first(), 10);
+        const count = left_nums.get(l) orelse 0;
+        try left_nums.put(l, count + 1);
+
+        const r = try std.fmt.parseInt(i32, number_it.next().?, 10);
+        try right.append(r);
+    }
+
+    var total: i32 = 0;
+    for (right.items) |r| {
+        if (left_nums.get(r)) |c| {
+            total += r * c;
+        }
+    }
+    return total;
 }
 
 test "it does p1 one line" {
@@ -39,4 +64,22 @@ test "it does p1 one line" {
     };
 
     try std.testing.expectEqual(1, try problem.part1());
+}
+
+test "p2 sample" {
+    const input =
+        \\3   4
+        \\4   3
+        \\2   5
+        \\1   3
+        \\3   9
+        \\3   3
+        \\
+    ;
+    const problem: @This() = .{
+        .input = input,
+        .allocator = std.testing.allocator,
+    };
+
+    try std.testing.expectEqual(31, try problem.part2());
 }
