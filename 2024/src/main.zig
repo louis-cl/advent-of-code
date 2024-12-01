@@ -17,15 +17,14 @@ pub fn main() !void {
         .allocator = allocator,
     };
 
-    if (try problem.part1()) |solution|
-        try stdout.print(switch (@TypeOf(solution)) {
-            []const u8 => "{s}",
-            else => "{any}",
-        } ++ "\n", .{solution});
+    const sol = try problem.solve();
+    try stdout.print(switch (@TypeOf(sol.p1)) {
+        []const u8 => "{s}",
+        else => "{any}",
+    } ++ "\n", .{sol.p1});
 
-    if (try problem.part2()) |solution|
-        try stdout.print(switch (@TypeOf(solution)) {
-            []const u8 => "{s}",
-            else => "{any}",
-        } ++ "\n", .{solution});
+    try stdout.print(switch (@TypeOf(sol.p2)) {
+        []const u8 => "{s}",
+        else => "{any}",
+    } ++ "\n", .{sol.p2});
 }
