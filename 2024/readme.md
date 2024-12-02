@@ -34,3 +34,8 @@ commit 2d45ea0: run part1 and part2 in one go
 commit 292f465: avoid hashmap in part2, leverage sorted input
   Time (mean ± σ):       1.4 ms ±   0.2 ms    [User: 0.5 ms, System: 0.6 ms]
   Range (min … max):     0.6 ms …   2.0 ms    2570 runs
+
+## Day 2
+commit 736751d:
+  Time (mean ± σ):       1.4 ms ±   0.2 ms    [User: 0.5 ms, System: 0.6 ms]
+  Range (min … max):     0.6 ms …   1.9 ms    2860 runs

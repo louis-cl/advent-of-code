@@ -6,6 +6,14 @@ allocator: mem.Allocator,
 
 const Solution = struct { p1: u32, p2: u64 };
 
+fn parseInt(buf: []const u8) i32 {
+    var r: i32 = buf[0] - '0';
+    if (buf.len > 1) {
+        r = 10 * r + buf[1] - '0';
+    }
+    return r;
+}
+
 pub fn solve(this: *const @This()) !Solution {
     var line_it = mem.splitScalar(u8, this.input, '\n');
     var p1: u32 = 0;
@@ -17,7 +25,7 @@ pub fn solve(this: *const @This()) !Solution {
         defer numbers.deinit();
         var number_it = mem.splitScalar(u8, line, ' ');
         while (number_it.next()) |n| {
-            try numbers.append(try std.fmt.parseInt(i32, n, 10));
+            try numbers.append(parseInt(n));
         }
 
         if (isSafe(numbers.items, 0)) {
