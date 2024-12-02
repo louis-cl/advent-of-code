@@ -39,3 +39,6 @@ commit 292f465: avoid hashmap in part2, leverage sorted input
 commit 736751d:
   Time (mean ± σ):       1.4 ms ±   0.2 ms    [User: 0.5 ms, System: 0.6 ms]
   Range (min … max):     0.6 ms …   1.9 ms    2860 runs
+commit b6d60de: write my own parse int
+  Time (mean ± σ):       1.3 ms ±   0.1 ms    [User: 0.4 ms, System: 0.6 ms]
+  Range (min … max):     0.9 ms …   1.8 ms    2233 runs
