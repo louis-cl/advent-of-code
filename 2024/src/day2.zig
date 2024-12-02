@@ -9,6 +9,7 @@ const Solution = struct { p1: u32, p2: u64 };
 pub fn solve(this: *const @This()) !Solution {
     var line_it = mem.splitScalar(u8, this.input, '\n');
     var p1: u32 = 0;
+    var p2: u32 = 0;
     while (line_it.next()) |line| {
         if (line.len == 0) continue;
 
@@ -19,15 +20,31 @@ pub fn solve(this: *const @This()) !Solution {
             try numbers.append(try std.fmt.parseInt(i32, n, 10));
         }
 
-        if (isSafe(numbers.items)) p1 += 1;
+        if (isSafe(numbers.items, 0)) {
+            p1 += 1;
+            p2 += 1;
+        } else {
+            if (isSafe(numbers.items[1..], 0)) {
+                p2 += 1; // skip first element
+            } else {
+                // skip any other element
+                for (1.., numbers.items[1..]) |i, _| {
+                    if (isSafe(numbers.items, i)) {
+                        p2 += 1;
+                        break;
+                    }
+                }
+            }
+        }
     }
-    return Solution{ .p1 = p1, .p2 = 0 };
+    return Solution{ .p1 = p1, .p2 = p2 };
 }
 
-fn isSafe(nums: []const i32) bool {
+fn isSafe(nums: []const i32, skip: usize) bool {
     var previous = nums[0];
-    const up = nums[1] - previous;
-    for (nums[1..]) |n| {
+    const up = if (skip == 1) nums[2] - previous else nums[1] - previous;
+    for (nums[1..], 1..) |n, i| {
+        if (i == skip) continue;
         const diff = n - previous;
         if (@abs(diff) < 1 or @abs(diff) > 3 or up * diff < 0) return false;
         previous = n;
@@ -51,5 +68,5 @@ test "sample" {
     };
     const sol = try problem.solve();
     try std.testing.expectEqual(2, sol.p1);
-    // try std.testing.expectEqual(0, sol.p2);
+    try std.testing.expectEqual(4, sol.p2);
 }
