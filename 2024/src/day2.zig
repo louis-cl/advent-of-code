@@ -8,33 +8,31 @@ const Solution = struct { p1: u32, p2: u64 };
 
 pub fn solve(this: *const @This()) !Solution {
     var line_it = mem.splitScalar(u8, this.input, '\n');
-    var safe: u32 = 0;
+    var p1: u32 = 0;
     while (line_it.next()) |line| {
         if (line.len == 0) continue;
+
+        var numbers = std.ArrayList(i32).init(this.allocator);
+        defer numbers.deinit();
         var number_it = mem.splitScalar(u8, line, ' ');
-        const first = try int(number_it.first());
-        const second = try int(number_it.peek().?);
-        if (first == second) continue;
-        const up = first < second;
-        var previous = first;
-        var line_safe = true;
-        while (number_it.next()) |next| {
-            const n = try int(next);
-            if (up) {
-                line_safe = previous + 1 <= n and n <= previous + 3;
-            } else {
-                line_safe = previous - 1 >= n and n >= previous - 3;
-            }
-            if (!line_safe) break;
-            previous = n;
+        while (number_it.next()) |n| {
+            try numbers.append(try std.fmt.parseInt(i32, n, 10));
         }
-        if (line_safe) safe += 1;
+
+        if (isSafe(numbers.items)) p1 += 1;
     }
-    return Solution{ .p1 = safe, .p2 = 0 };
+    return Solution{ .p1 = p1, .p2 = 0 };
 }
 
-fn int(num: []const u8) !i32 {
-    return try std.fmt.parseInt(i32, num, 10);
+fn isSafe(nums: []const i32) bool {
+    var previous = nums[0];
+    const up = nums[1] - previous;
+    for (nums[1..]) |n| {
+        const diff = n - previous;
+        if (@abs(diff) < 1 or @abs(diff) > 3 or up * diff < 0) return false;
+        previous = n;
+    }
+    return true;
 }
 
 test "sample" {
