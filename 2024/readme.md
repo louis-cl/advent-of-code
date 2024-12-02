@@ -42,3 +42,6 @@ commit 736751d:
 commit b6d60de: write my own parse int
   Time (mean ± σ):       1.3 ms ±   0.1 ms    [User: 0.4 ms, System: 0.6 ms]
   Range (min … max):     0.9 ms …   1.8 ms    2233 runs
+commit d135adf: use array of 8 pos instead of arraylist
+  Time (mean ± σ):       1.2 ms ±   0.3 ms    [User: 0.4 ms, System: 0.5 ms]
+  Range (min … max):     0.5 ms …   2.0 ms    2844 runs
