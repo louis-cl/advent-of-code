@@ -21,23 +21,26 @@ pub fn solve(this: *const @This()) !Solution {
     while (line_it.next()) |line| {
         if (line.len == 0) continue;
 
-        var numbers = std.ArrayList(i32).init(this.allocator);
-        defer numbers.deinit();
+        var buff: [8]i32 = undefined;
+        var len: usize = 0;
         var number_it = mem.splitScalar(u8, line, ' ');
         while (number_it.next()) |n| {
-            try numbers.append(parseInt(n));
+            buff[len] = parseInt(n);
+            len += 1;
         }
 
-        if (isSafe(numbers.items, 0)) {
+        const numbers = buff[0..len];
+
+        if (isSafe(numbers, 0)) {
             p1 += 1;
             p2 += 1;
         } else {
-            if (isSafe(numbers.items[1..], 0)) {
+            if (isSafe(numbers[1..], 0)) {
                 p2 += 1; // skip first element
             } else {
                 // skip any other element
-                for (1.., numbers.items[1..]) |i, _| {
-                    if (isSafe(numbers.items, i)) {
+                for (1.., numbers[1..]) |i, _| {
+                    if (isSafe(numbers, i)) {
                         p2 += 1;
                         break;
                     }
