@@ -5,51 +5,77 @@ input: []const u8,
 allocator: mem.Allocator,
 
 const Solution = struct { p1: u32, p2: u32 };
+
 const Mul = struct { left: u32, right: u32 };
+const Instr = union(enum) {
+    mul: Mul,
+    do: struct {},
+    dont: struct {},
+};
 
 pub fn solve(this: *const @This()) !Solution {
     var data = this.input;
     var p1: u32 = 0;
+    var p2: u32 = 0;
+    var active: bool = true;
     while (data.len > 0) {
-        const mul = parseMul(data);
-        data = mul.rest;
-        if (mul.mul) |m| {
-            p1 += m.left * m.right;
+        const instr = nextInstr(data);
+        if (instr.instr == null) break;
+        switch (instr.instr.?) {
+            .mul => |m| {
+                const val = m.left * m.right;
+                p1 += val;
+                if (active) p2 += val;
+            },
+            .do => active = true,
+            .dont => active = false,
         }
+        data = instr.rest;
     }
 
-    return Solution{ .p1 = p1, .p2 = 0 };
+    return Solution{ .p1 = p1, .p2 = p2 };
+}
+
+fn nextInstr(input: []const u8) struct { rest: []const u8, instr: ?Instr } {
+    var i: usize = 0;
+    while (i < input.len) {
+        const m = parseMul(input[i..]);
+        if (m.mul) |r| {
+            return .{ .rest = m.rest, .instr = Instr{ .mul = r } };
+        }
+        if (mem.startsWith(u8, input[i..], "do()")) {
+            return .{ .rest = input[i + 4 ..], .instr = Instr{ .do = .{} } };
+        }
+        if (mem.startsWith(u8, input[i..], "don't()")) {
+            return .{ .rest = input[i + 7 ..], .instr = Instr{ .dont = .{} } };
+        }
+        i += 1;
+    }
+    return .{ .rest = input, .instr = null };
 }
 
 fn parseMul(input: []const u8) struct { rest: []const u8, mul: ?Mul } {
-    var i: u8 = 0;
-    // mul(
-    while (i < input.len and !mem.startsWith(u8, input[i..], "mul(")) i += 1;
-    if (i >= input.len) return .{ .rest = "", .mul = null };
-    i += 4;
-    // std.debug.print("GOT MUL, rest {s}\n", .{input[i..]});
+    blk: {
+        // mul(
+        if (!mem.startsWith(u8, input, "mul(")) break :blk;
 
-    // number
-    const left = parseNum(input[i..]);
-    if (left.n == null) return .{ .rest = left.rest, .mul = null };
-    // std.debug.print("GOT LEFT\n", .{});
+        // number
+        const left = parseNum(input[4..]);
+        if (left.n == null) break :blk;
 
-    // ,
-    if (left.rest.len < 1) return .{ .rest = "", .mul = null };
-    if (left.rest[0] != ',') return .{ .rest = left.rest[1..], .mul = null };
-    // std.debug.print("GOT ,\n", .{});
+        // ,
+        if (left.rest.len < 1 or left.rest[0] != ',') break :blk;
 
-    // number
-    const right = parseNum(left.rest[1..]);
-    if (right.n == null) return .{ .rest = right.rest, .mul = null };
-    // std.debug.print("GOT RIGHT\n", .{});
+        // number
+        const right = parseNum(left.rest[1..]);
+        if (right.n == null) break :blk;
 
-    // )
-    if (right.rest.len < 1) return .{ .rest = "", .mul = null };
-    if (right.rest[0] != ')') return .{ .rest = right.rest[1..], .mul = null };
-    // std.debug.print("GOT )\n", .{});
+        // )
+        if (right.rest.len < 1 or right.rest[0] != ')') break :blk;
 
-    return .{ .rest = right.rest[1..], .mul = Mul{ .left = left.n.?, .right = right.n.? } };
+        return .{ .rest = right.rest[1..], .mul = Mul{ .left = left.n.?, .right = right.n.? } };
+    }
+    return .{ .rest = input, .mul = null };
 }
 
 fn parseNum(input: []const u8) struct { rest: []const u8, n: ?u32 } {
@@ -75,9 +101,27 @@ test "parseNumBad" {
     try std.testing.expectEqualSlices(u8, "_2340", r.rest);
 }
 
-test "parse" {
-    const r = parseMul("xmul(2,4)we");
+test "parseMul" {
+    const r = parseMul("mul(2,4)we");
     try std.testing.expectEqual(Mul{ .left = 2, .right = 4 }, r.mul.?);
+    try std.testing.expectEqualSlices(u8, "we", r.rest);
+}
+
+test "parseMulPartial" {
+    const r = parseMul("mul(");
+    try std.testing.expectEqual(null, r.mul);
+    try std.testing.expectEqualSlices(u8, "mul(", r.rest);
+}
+
+test "nextInstrMul" {
+    const r = nextInstr("xmul(2,4)we");
+    try std.testing.expectEqual(Mul{ .left = 2, .right = 4 }, r.instr.?.mul);
+    try std.testing.expectEqualSlices(u8, "we", r.rest);
+}
+
+test "nextInstrDo" {
+    const r = nextInstr("xmudo()we");
+    try std.testing.expectEqual(Instr{ .do = .{} }, r.instr.?);
     try std.testing.expectEqualSlices(u8, "we", r.rest);
 }
 
@@ -88,5 +132,13 @@ test "sample" {
     };
     const sol = try problem.solve();
     try std.testing.expectEqual(161, sol.p1);
-    // try std.testing.expectEqual(4, sol.p2);
+}
+
+test "sample2" {
+    const problem: @This() = .{
+        .input = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))",
+        .allocator = std.testing.allocator,
+    };
+    const sol = try problem.solve();
+    try std.testing.expectEqual(48, sol.p2);
 }
