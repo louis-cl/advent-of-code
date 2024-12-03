@@ -9,8 +9,8 @@ const Solution = struct { p1: u32, p2: u32 };
 const Mul = struct { left: u32, right: u32 };
 const Instr = union(enum) {
     mul: Mul,
-    do: struct {},
-    dont: struct {},
+    do,
+    dont,
 };
 
 pub fn solve(this: *const @This()) !Solution {
@@ -18,10 +18,8 @@ pub fn solve(this: *const @This()) !Solution {
     var p1: u32 = 0;
     var p2: u32 = 0;
     var active: bool = true;
-    while (data.len > 0) {
-        const instr = nextInstr(data);
-        if (instr.instr == null) break;
-        switch (instr.instr.?) {
+    while (nextInstr(data)) |res| {
+        switch (res.instr) {
             .mul => |m| {
                 const val = m.left * m.right;
                 p1 += val;
@@ -30,98 +28,92 @@ pub fn solve(this: *const @This()) !Solution {
             .do => active = true,
             .dont => active = false,
         }
-        data = instr.rest;
+        data = res.rest;
     }
 
     return Solution{ .p1 = p1, .p2 = p2 };
 }
 
-fn nextInstr(input: []const u8) struct { rest: []const u8, instr: ?Instr } {
+fn nextInstr(input: []const u8) ?struct { rest: []const u8, instr: Instr } {
     var i: usize = 0;
     while (i < input.len) {
-        const m = parseMul(input[i..]);
-        if (m.mul) |r| {
-            return .{ .rest = m.rest, .instr = Instr{ .mul = r } };
+        if (parseMul(input[i..])) |m| {
+            return .{ .rest = m.rest, .instr = Instr{ .mul = m.mul } };
         }
         if (mem.startsWith(u8, input[i..], "do()")) {
-            return .{ .rest = input[i + 4 ..], .instr = Instr{ .do = .{} } };
+            return .{ .rest = input[i + 4 ..], .instr = Instr{ .do = {} } };
         }
         if (mem.startsWith(u8, input[i..], "don't()")) {
-            return .{ .rest = input[i + 7 ..], .instr = Instr{ .dont = .{} } };
+            return .{ .rest = input[i + 7 ..], .instr = Instr{ .dont = {} } };
         }
         i += 1;
     }
-    return .{ .rest = input, .instr = null };
+    return null;
 }
 
-fn parseMul(input: []const u8) struct { rest: []const u8, mul: ?Mul } {
-    blk: {
-        // mul(
-        if (!mem.startsWith(u8, input, "mul(")) break :blk;
+fn parseMul(input: []const u8) ?struct { rest: []const u8, mul: Mul } {
+    // mul(
+    if (!mem.startsWith(u8, input, "mul(")) return null;
 
-        // number
-        const left = parseNum(input[4..]);
-        if (left.n == null) break :blk;
+    // number
+    const left = parseNum(input[4..]);
+    if (left == null) return null;
 
-        // ,
-        if (left.rest.len < 1 or left.rest[0] != ',') break :blk;
+    // ,
+    if (left.?.rest.len < 1 or left.?.rest[0] != ',') return null;
 
-        // number
-        const right = parseNum(left.rest[1..]);
-        if (right.n == null) break :blk;
+    // number
+    const right = parseNum(left.?.rest[1..]);
+    if (right == null) return null;
 
-        // )
-        if (right.rest.len < 1 or right.rest[0] != ')') break :blk;
+    // )
+    if (right.?.rest.len < 1 or right.?.rest[0] != ')') return null;
 
-        return .{ .rest = right.rest[1..], .mul = Mul{ .left = left.n.?, .right = right.n.? } };
-    }
-    return .{ .rest = input, .mul = null };
+    return .{ .rest = right.?.rest[1..], .mul = Mul{ .left = left.?.n, .right = right.?.n } };
 }
 
-fn parseNum(input: []const u8) struct { rest: []const u8, n: ?u32 } {
+fn parseNum(input: []const u8) ?struct { rest: []const u8, n: u32 } {
     var r: u32 = 0;
     var i: u8 = 0;
     while (i < input.len and i < 3 and std.ascii.isDigit(input[i])) {
         r = r * 10 + input[i] - '0';
         i += 1;
     }
-    if (i == 0) return .{ .rest = input, .n = null };
+    if (i == 0) return null;
     return .{ .rest = input[i..], .n = r };
 }
 
 test "parseNum" {
-    const r = parseNum("2340");
-    try std.testing.expectEqual(234, r.n.?);
+    const r = parseNum("2340").?;
+    try std.testing.expectEqual(234, r.n);
     try std.testing.expectEqualSlices(u8, "0", r.rest);
 }
 
 test "parseNumBad" {
     const r = parseNum("_2340");
-    try std.testing.expectEqual(null, r.n);
-    try std.testing.expectEqualSlices(u8, "_2340", r.rest);
+    try std.testing.expectEqual(null, r);
 }
 
 test "parseMul" {
-    const r = parseMul("mul(2,4)we");
-    try std.testing.expectEqual(Mul{ .left = 2, .right = 4 }, r.mul.?);
+    const r = parseMul("mul(2,4)we").?;
+    try std.testing.expectEqual(Mul{ .left = 2, .right = 4 }, r.mul);
     try std.testing.expectEqualSlices(u8, "we", r.rest);
 }
 
 test "parseMulPartial" {
     const r = parseMul("mul(");
-    try std.testing.expectEqual(null, r.mul);
-    try std.testing.expectEqualSlices(u8, "mul(", r.rest);
+    try std.testing.expectEqual(null, r);
 }
 
 test "nextInstrMul" {
-    const r = nextInstr("xmul(2,4)we");
-    try std.testing.expectEqual(Mul{ .left = 2, .right = 4 }, r.instr.?.mul);
+    const r = nextInstr("xmul(2,4)we").?;
+    try std.testing.expectEqual(Mul{ .left = 2, .right = 4 }, r.instr.mul);
     try std.testing.expectEqualSlices(u8, "we", r.rest);
 }
 
 test "nextInstrDo" {
-    const r = nextInstr("xmudo()we");
-    try std.testing.expectEqual(Instr{ .do = .{} }, r.instr.?);
+    const r = nextInstr("xmudo()we").?;
+    try std.testing.expectEqual(Instr{ .do = {} }, r.instr);
     try std.testing.expectEqualSlices(u8, "we", r.rest);
 }
 
