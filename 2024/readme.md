@@ -45,3 +45,8 @@ commit b6d60de: write my own parse int
 commit d135adf: use array of 8 pos instead of arraylist
   Time (mean ± σ):       1.2 ms ±   0.3 ms    [User: 0.4 ms, System: 0.5 ms]
   Range (min … max):     0.5 ms …   2.0 ms    2844 runs
+
+## Day 3
+commit 63e4eac:
+  Time (mean ± σ):       1.0 ms ±   0.2 ms    [User: 0.3 ms, System: 0.5 ms]
+  Range (min … max):     0.5 ms …   1.6 ms    3187 runs
