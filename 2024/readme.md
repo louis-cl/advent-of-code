@@ -50,3 +50,6 @@ commit d135adf: use array of 8 pos instead of arraylist
 commit 63e4eac:
   Time (mean ± σ):       1.0 ms ±   0.2 ms    [User: 0.3 ms, System: 0.5 ms]
   Range (min … max):     0.5 ms …   1.6 ms    3187 runs
+commit c3ec2e1: lifting optional one level (no impact)
+  Time (mean ± σ):       1.0 ms ±   0.1 ms    [User: 0.3 ms, System: 0.5 ms]
+  Range (min … max):     0.5 ms …   1.7 ms    2653 runs

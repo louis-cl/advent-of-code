@@ -53,23 +53,30 @@ fn nextInstr(input: []const u8) ?struct { rest: []const u8, instr: Instr } {
 
 fn parseMul(input: []const u8) ?struct { rest: []const u8, mul: Mul } {
     // mul(
-    if (!mem.startsWith(u8, input, "mul(")) return null;
+    const rest = parseToken(input, "mul(");
+    if (rest == null) return null;
 
     // number
-    const left = parseNum(input[4..]);
+    const left = parseNum(rest.?);
     if (left == null) return null;
 
     // ,
-    if (left.?.rest.len < 1 or left.?.rest[0] != ',') return null;
+    if (!mem.startsWith(u8, left.?.rest, ",")) return null;
 
     // number
     const right = parseNum(left.?.rest[1..]);
     if (right == null) return null;
 
     // )
-    if (right.?.rest.len < 1 or right.?.rest[0] != ')') return null;
+    const restP = parseToken(right.?.rest, ")");
+    if (restP == null) return null;
 
-    return .{ .rest = right.?.rest[1..], .mul = Mul{ .left = left.?.n, .right = right.?.n } };
+    return .{ .rest = restP.?, .mul = Mul{ .left = left.?.n, .right = right.?.n } };
+}
+
+fn parseToken(input: []const u8, token: []const u8) ?[]const u8 {
+    if (!mem.startsWith(u8, input, token)) return null;
+    return input[token.len..];
 }
 
 fn parseNum(input: []const u8) ?struct { rest: []const u8, n: u32 } {
