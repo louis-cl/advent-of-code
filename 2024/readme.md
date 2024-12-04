@@ -53,3 +53,8 @@ commit 63e4eac:
 commit c3ec2e1: lifting optional one level (no impact)
   Time (mean ± σ):       1.0 ms ±   0.1 ms    [User: 0.3 ms, System: 0.5 ms]
   Range (min … max):     0.5 ms …   1.7 ms    2653 runs
+
+## Day 4
+commit e0021f7:
+  Time (mean ± σ):       1.8 ms ±   0.3 ms    [User: 1.0 ms, System: 0.5 ms]
+  Range (min … max):     0.9 ms …   2.7 ms    1729 runs
