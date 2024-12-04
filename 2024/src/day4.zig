@@ -11,8 +11,7 @@ pub fn solve(this: *const @This()) !Solution {
     defer lines.deinit();
     var iter = mem.splitScalar(u8, this.input, '\n');
     while (iter.next()) |line| if (line.len > 0) lines.append(line) catch unreachable;
-
-    return Solution{ .p1 = part1(lines.items), .p2 = 0 };
+    return Solution{ .p1 = part1(lines.items), .p2 = part2(lines.items) };
 }
 
 // input is a rectangle
@@ -51,6 +50,21 @@ fn equal(pattern: *const [4]u8, a: u8, b: u8, c: u8) bool {
     return a == pattern[1] and b == pattern[2] and c == pattern[3];
 }
 
+fn part2(input: [][]const u8) u32 {
+    var count: u32 = 0;
+    for (1..input.len - 1) |x| {
+        for (1..input[0].len - 1) |y| {
+            if (input[x][y] == 'A' and isMS(input[x - 1][y - 1], input[x + 1][y + 1]) and isMS(input[x - 1][y + 1], input[x + 1][y - 1]))
+                count += 1;
+        }
+    }
+    return count;
+}
+
+fn isMS(a: u8, b: u8) bool {
+    return (a == 'M' and b == 'S') or (a == 'S' and b == 'M');
+}
+
 test "sample" {
     const input =
         \\MMMSXXMASM
@@ -71,4 +85,5 @@ test "sample" {
     };
     const sol = try problem.solve();
     try std.testing.expectEqual(18, sol.p1);
+    try std.testing.expectEqual(9, sol.p2);
 }
