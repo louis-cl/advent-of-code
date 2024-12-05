@@ -18,13 +18,23 @@ pub fn solve(this: *const @This()) !Solution {
     }
     // updates
     var p1: u32 = 0;
+    var p2: u32 = 0;
     while (iter.next()) |line| {
         if (line.len == 0) break;
         const pages = parseLine(this.allocator, line);
         defer this.allocator.free(pages);
-        if (followsRules(rules, pages)) p1 += pages[pages.len / 2];
+        if (followsRules(rules, pages)) {
+            p1 += pages[pages.len / 2];
+        } else {
+            mem.sort(u8, pages, rules, before);
+            p2 += pages[pages.len / 2];
+        }
     }
-    return Solution{ .p1 = p1, .p2 = 0 };
+    return Solution{ .p1 = p1, .p2 = p2 };
+}
+
+fn before(rules: [100][100]bool, lhs: u8, rhs: u8) bool {
+    return rules[lhs][rhs];
 }
 
 fn followsRules(rules: [100][100]bool, pages: []const u8) bool {
@@ -36,7 +46,7 @@ fn followsRules(rules: [100][100]bool, pages: []const u8) bool {
     return true;
 }
 
-fn parseLine(allocator: mem.Allocator, line: []const u8) []const u8 {
+fn parseLine(allocator: mem.Allocator, line: []const u8) []u8 {
     // length of a line of n numbers is 3n - 1 (because split removes the new line)
     std.debug.assert((line.len + 1) % 3 == 0);
     const n = (line.len + 1) / 3;
@@ -77,43 +87,43 @@ test "simple" {
     try std.testing.expectEqual(22, sol.p1);
 }
 
-// test "sample" {
-//     const input =
-//         \\47|53
-//         \\97|13
-//         \\97|61
-//         \\97|47
-//         \\75|29
-//         \\61|13
-//         \\75|53
-//         \\29|13
-//         \\97|29
-//         \\53|29
-//         \\61|53
-//         \\97|53
-//         \\61|29
-//         \\47|13
-//         \\75|47
-//         \\97|75
-//         \\47|61
-//         \\75|61
-//         \\47|29
-//         \\75|13
-//         \\53|13
-//         \\
-//         \\75,47,61,53,29
-//         \\97,61,53,29,13
-//         \\75,29,13
-//         \\75,97,47,61,53
-//         \\61,13,29
-//         \\97,13,75,29,47
-//         \\
-//     ;
-//     const problem: @This() = .{
-//         .input = input,
-//         .allocator = std.testing.allocator,
-//     };
-//     const sol = try problem.solve();
-//     try std.testing.expectEqual(143, sol.p1);
-//     // try std.testing.expectEqual(9, sol.p2);
-// }
+test "sample" {
+    const input =
+        \\47|53
+        \\97|13
+        \\97|61
+        \\97|47
+        \\75|29
+        \\61|13
+        \\75|53
+        \\29|13
+        \\97|29
+        \\53|29
+        \\61|53
+        \\97|53
+        \\61|29
+        \\47|13
+        \\75|47
+        \\97|75
+        \\47|61
+        \\75|61
+        \\47|29
+        \\75|13
+        \\53|13
+        \\
+        \\75,47,61,53,29
+        \\97,61,53,29,13
+        \\75,29,13
+        \\75,97,47,61,53
+        \\61,13,29
+        \\97,13,75,29,47
+        \\
+    ;
+    const problem: @This() = .{
+        .input = input,
+        .allocator = std.testing.allocator,
+    };
+    const sol = try problem.solve();
+    try std.testing.expectEqual(143, sol.p1);
+    try std.testing.expectEqual(123, sol.p2);
+}
