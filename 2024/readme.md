@@ -68,3 +68,6 @@ commit 6fc6c4c:
 commit 1478536: done without the optimize flags, otherwise after 12min it didn't finish 1 warmup run
   Time (mean ± σ):     21.795 s ±  0.196 s    [User: 21.658 s, System: 0.136 s]
   Range (min … max):   21.576 s … 22.251 s    10 runs
+commit baa2d7e: do not retry rock position, allows to continue path instead of starting from scratch
+  Time (mean ± σ):     14.670 s ±  0.081 s    [User: 14.575 s, System: 0.094 s]
+  Range (min … max):   14.504 s … 14.824 s    10 runs
