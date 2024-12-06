@@ -63,3 +63,8 @@ commit e0021f7:
 commit 6fc6c4c:
   Time (mean ± σ):       1.2 ms ±   0.2 ms    [User: 0.3 ms, System: 0.6 ms]
   Range (min … max):     0.5 ms …   2.1 ms    2850 runs
+
+## Day 6
+commit 1478536: done without the optimize flags, otherwise after 12min it didn't finish 1 warmup run
+  Time (mean ± σ):     21.795 s ±  0.196 s    [User: 21.658 s, System: 0.136 s]
+  Range (min … max):   21.576 s … 22.251 s    10 runs
