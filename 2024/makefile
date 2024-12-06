@@ -6,7 +6,7 @@ setup:
 	$(ZIG_BUILD) -Dday=$(day) setup
 
 run:
-	$(ZIG_BUILD) -Dday=$(day) run
+	$(ZIG_BUILD) -Dday=$(day) run -Doptimize=ReleaseSafe
 
 test:
 	$(ZIG_BUILD) -Dday=$(day) test
