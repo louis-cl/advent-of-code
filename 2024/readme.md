@@ -64,7 +64,7 @@ commit 6fc6c4c:
   Time (mean ± σ):       1.2 ms ±   0.2 ms    [User: 0.3 ms, System: 0.6 ms]
   Range (min … max):     0.5 ms …   2.1 ms    2850 runs
 
-## Day 6
+## Day 6 releaseSafe!
 commit 1478536: done with release safe flag, otherwise after 12min it didn't finish 1 warmup run
   Time (mean ± σ):      6.386 s ±  0.357 s    [User: 6.144 s, System: 0.242 s]
   Range (min … max):    6.020 s …  6.872 s    10 runs

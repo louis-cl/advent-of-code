@@ -93,6 +93,8 @@ fn part2(allocator: mem.Allocator, map: Map, start: State) u32 {
     var p = start;
     var rocks = std.AutoHashMap([2]i32, void).init(allocator);
     defer rocks.deinit();
+    var visited = std.AutoHashMap(State, void).init(allocator);
+    defer visited.deinit();
     map.set(start.x, start.y, Cell.free); // prevent blocking the start
     while (true) {
         // std.debug.print("guard at {d},{d}\n", .{ p.x, p.y });
@@ -104,7 +106,8 @@ fn part2(allocator: mem.Allocator, map: Map, start: State) u32 {
                 if (!rocks.contains(.{ next.x, next.y })) {
                     // std.debug.print("try rock at {d},{d}\n", .{ next.x, next.y });
                     map.set(next.x, next.y, Cell.block);
-                    if (cycles(allocator, map, p)) rocks.put(.{ next.x, next.y }, {}) catch unreachable;
+                    if (cycles(&visited, map, p)) rocks.put(.{ next.x, next.y }, {}) catch unreachable;
+                    visited.clearRetainingCapacity();
                     map.set(next.x, next.y, Cell.free); // undo, mark free to not try again
                 }
                 p = next;
@@ -115,10 +118,8 @@ fn part2(allocator: mem.Allocator, map: Map, start: State) u32 {
     return rocks.count();
 }
 
-fn cycles(allocator: mem.Allocator, map: Map, start: State) bool {
+fn cycles(visited: *std.AutoHashMap(State, void), map: Map, start: State) bool {
     var p = start;
-    var visited = std.AutoHashMap(State, void).init(allocator);
-    defer visited.deinit();
     while (!visited.contains(p)) {
         // std.debug.print("\tCYCLE, guard at {d},{d}\n", .{ p.x, p.y });
         visited.put(p, {}) catch unreachable;
