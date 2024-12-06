@@ -89,12 +89,49 @@ fn part1(map: Map, start: State) u32 {
     return count;
 }
 
+const Visited = struct {
+    data: []u8,
+    n: usize,
+
+    fn encode(dx: i8, dy: i8) u8 {
+        // when you wish direction was an enum...
+        if (dx == 0 and dy == 1) {
+            return 1;
+        } else if (dx == 1 and dy == 0) {
+            return 2;
+        } else if (dx == 0 and dy == -1) {
+            return 4;
+        } else if (dx == -1 and dy == 0) {
+            return 8;
+        } else {
+            unreachable;
+        }
+    }
+
+    fn pos(self: *const Visited, state: State) usize {
+        return @as(usize, @intCast(state.x)) * self.n + @as(usize, @intCast(state.y));
+    }
+
+    pub fn contains(self: *const Visited, state: State) bool {
+        const cell = self.data[self.pos(state)];
+        return (cell & encode(state.dx, state.dy)) == 1;
+    }
+
+    pub fn put(self: *Visited, state: State) void {
+        self.data[self.pos(state)] |= encode(state.dx, state.dy);
+    }
+
+    pub fn clearRetainingCapacity(self: *Visited) void {
+        @memset(self.data, 0);
+    }
+};
+
 fn part2(allocator: mem.Allocator, map: Map, start: State) u32 {
     var p = start;
     var rocks = std.AutoHashMap([2]i32, void).init(allocator);
     defer rocks.deinit();
-    var visited = std.AutoHashMap(State, void).init(allocator);
-    defer visited.deinit();
+    var visited = Visited{ .data = allocator.alloc(u8, map.n * map.n) catch unreachable, .n = map.n };
+    defer allocator.free(visited.data);
     map.set(start.x, start.y, Cell.free); // prevent blocking the start
     while (true) {
         // std.debug.print("guard at {d},{d}\n", .{ p.x, p.y });
@@ -118,11 +155,11 @@ fn part2(allocator: mem.Allocator, map: Map, start: State) u32 {
     return rocks.count();
 }
 
-fn cycles(visited: *std.AutoHashMap(State, void), map: Map, start: State) bool {
+fn cycles(visited: *Visited, map: Map, start: State) bool {
     var p = start;
     while (!visited.contains(p)) {
         // std.debug.print("\tCYCLE, guard at {d},{d}\n", .{ p.x, p.y });
-        visited.put(p, {}) catch unreachable;
+        visited.put(p);
         const next = p.next();
         if (!map.contains(next.x, next.y)) return false;
         switch (map.get(next.x, next.y)) {
