@@ -71,4 +71,6 @@ commit 1478536: done with release safe flag, otherwise after 12min it didn't fin
 commit baa2d7e: do not retry rock position, allows to continue path instead of starting from scratch
   Time (mean ± σ):      2.183 s ±  0.092 s    [User: 2.098 s, System: 0.084 s]
   Range (min … max):    2.081 s …  2.366 s    10 runs
-
+commit 3390ebe: reuse hashmap in cycles check instead of creating a new one
+  Time (mean ± σ):     840.2 ms ±  41.6 ms    [User: 839.7 ms, System: 0.4 ms]
+  Range (min … max):   789.6 ms … 879.2 ms    10 runs
