@@ -93,22 +93,23 @@ fn part2(allocator: mem.Allocator, map: Map, start: State) u32 {
     var p = start;
     var rocks = std.AutoHashMap([2]i32, void).init(allocator);
     defer rocks.deinit();
+    map.set(start.x, start.y, Cell.free); // prevent blocking the start
     while (true) {
         // std.debug.print("guard at {d},{d}\n", .{ p.x, p.y });
         const next = p.next();
         if (!map.contains(next.x, next.y)) break;
         switch (map.get(next.x, next.y)) {
             .block => p = p.turn(),
-            .free, .walked => {
-                // try a rock
-                if (!(next.x == start.x and next.y == start.y) and !rocks.contains(.{ next.x, next.y })) { // don't put on start
+            .walked => { // try a rock
+                if (!rocks.contains(.{ next.x, next.y })) {
                     // std.debug.print("try rock at {d},{d}\n", .{ next.x, next.y });
                     map.set(next.x, next.y, Cell.block);
-                    if (cycles(allocator, map, start)) rocks.put(.{ next.x, next.y }, {}) catch unreachable;
-                    map.set(next.x, next.y, Cell.walked); // undo, cell doesn't matter
+                    if (cycles(allocator, map, p)) rocks.put(.{ next.x, next.y }, {}) catch unreachable;
+                    map.set(next.x, next.y, Cell.free); // undo, mark free to not try again
                 }
                 p = next;
             },
+            .free => p = next,
         }
     }
     return rocks.count();
