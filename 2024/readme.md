@@ -74,3 +74,6 @@ commit baa2d7e: do not retry rock position, allows to continue path instead of s
 commit 3390ebe: reuse hashmap in cycles check instead of creating a new one
   Time (mean ± σ):     840.2 ms ±  41.6 ms    [User: 839.7 ms, System: 0.4 ms]
   Range (min … max):   789.6 ms … 879.2 ms    10 runs
+commit c465f59: replace hashmap for visited by an array
+  Time (mean ± σ):      60.8 ms ±   1.7 ms    [User: 60.0 ms, System: 0.5 ms]
+  Range (min … max):    59.6 ms …  67.8 ms    49 runs
