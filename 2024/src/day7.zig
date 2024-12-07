@@ -4,7 +4,7 @@ const mem = std.mem;
 input: []const u8,
 allocator: mem.Allocator,
 
-const Solution = struct { p1: i64, p2: u32 };
+const Solution = struct { p1: i64, p2: i64 };
 
 pub fn solve(this: *const @This()) !Solution {
     var iter = mem.splitScalar(u8, this.input, '\n');
@@ -12,6 +12,7 @@ pub fn solve(this: *const @This()) !Solution {
     defer this.allocator.free(rhs);
 
     var p1: i64 = 0;
+    var p2: i64 = 0;
     while (iter.next()) |line| {
         if (line.len == 0) break;
         const lhs = consumeInt(line).?;
@@ -24,15 +25,32 @@ pub fn solve(this: *const @This()) !Solution {
             pending = res.rest[1..];
         }
         // std.debug.print("{d} to '{any}'\n", .{ lhs.val, rhs[0..i] });
-        if (canSolve(0, lhs.val, rhs[0..i])) p1 += lhs.val;
+        if (canSolve(0, lhs.val, rhs[0..i])) {
+            p1 += lhs.val;
+            p2 += lhs.val;
+        } else if (canSolve2(0, lhs.val, rhs[0..i])) p2 += lhs.val;
     }
-    return Solution{ .p1 = p1, .p2 = 0 };
+    return Solution{ .p1 = p1, .p2 = p2 };
 }
 
 fn canSolve(partial: i64, lhs: i64, rhs: []const i64) bool {
     if (rhs.len == 0) return partial == lhs;
     if (partial > lhs) return false;
     return canSolve(partial + rhs[0], lhs, rhs[1..]) or canSolve(partial * rhs[0], lhs, rhs[1..]);
+}
+
+fn canSolve2(partial: i64, lhs: i64, rhs: []const i64) bool {
+    if (rhs.len == 0) return partial == lhs;
+    if (partial > lhs) return false;
+    return canSolve2(partial + rhs[0], lhs, rhs[1..]) // +
+    or canSolve2(partial * rhs[0], lhs, rhs[1..]) // *
+    or canSolve2(concat(partial, rhs[0]), lhs, rhs[1..]); // |
+}
+
+fn concat(x: i64, y: i64) i64 {
+    var pow: i64 = 10;
+    while (pow <= y) pow *= 10;
+    return x * pow + y;
 }
 
 fn consumeInt(buf: []const u8) ?struct { rest: []const u8, val: i64 } {
@@ -63,5 +81,5 @@ test "sample" {
     };
     const sol = try problem.solve();
     try std.testing.expectEqual(3749, sol.p1);
-    // try std.testing.expectEqual(123, sol.p2);
+    try std.testing.expectEqual(11387, sol.p2);
 }
