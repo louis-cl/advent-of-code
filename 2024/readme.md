@@ -77,3 +77,8 @@ commit 3390ebe: reuse hashmap in cycles check instead of creating a new one
 commit c465f59: replace hashmap for visited by an array
   Time (mean ± σ):      60.8 ms ±   1.7 ms    [User: 60.0 ms, System: 0.5 ms]
   Range (min … max):    59.6 ms …  67.8 ms    49 runs
+
+## Day 7
+commit 89f9849:
+  Time (mean ± σ):      86.9 ms ±   1.8 ms    [User: 86.1 ms, System: 0.5 ms]
+  Range (min … max):    85.7 ms …  93.7 ms    34 runs
