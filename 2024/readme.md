@@ -82,3 +82,6 @@ commit c465f59: replace hashmap for visited by an array
 commit 89f9849:
   Time (mean ± σ):      86.9 ms ±   1.8 ms    [User: 86.1 ms, System: 0.5 ms]
   Range (min … max):    85.7 ms …  93.7 ms    34 runs
+commit 41f029d: search from the end to prune scenarios
+  Time (mean ± σ):       1.9 ms ±   0.4 ms    [User: 1.1 ms, System: 0.5 ms]
+  Range (min … max):     1.0 ms …   2.9 ms    1574 runs
