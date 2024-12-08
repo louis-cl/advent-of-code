@@ -85,3 +85,8 @@ commit 89f9849:
 commit 41f029d: search from the end to prune scenarios
   Time (mean ± σ):       1.9 ms ±   0.4 ms    [User: 1.1 ms, System: 0.5 ms]
   Range (min … max):     1.0 ms …   2.9 ms    1574 runs
+
+## Day 8
+commit 10b473b:
+  Time (mean ± σ):       1.3 ms ±   0.2 ms    [User: 0.3 ms, System: 0.7 ms]
+  Range (min … max):     0.5 ms …   2.0 ms    3122 runs
