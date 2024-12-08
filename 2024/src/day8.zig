@@ -39,8 +39,10 @@ pub fn solve(this: *const @This()) !Solution {
 }
 
 fn part1(allocator: mem.Allocator, antenas: []std.ArrayList(Point), n: i32) u32 {
-    var seen = std.AutoHashMap(Point, void).init(allocator);
-    defer seen.deinit();
+    var seen = allocator.alloc(bool, @intCast(n * n)) catch unreachable;
+    @memset(seen, false);
+    defer allocator.free(seen);
+    var count: u32 = 0;
     for (antenas) |ants| {
         if (ants.items.len <= 1) continue;
         for (ants.items[1..], 1..) |a, i| {
@@ -50,12 +52,18 @@ fn part1(allocator: mem.Allocator, antenas: []std.ArrayList(Point), n: i32) u32 
                 // r = b - diff = 2*b - a
                 const t = Point{ .x = 2 * a.x - b.x, .y = 2 * a.y - b.y };
                 const r = Point{ .x = 2 * b.x - a.x, .y = 2 * b.y - a.y };
-                if (isIn(t, n)) seen.put(t, {}) catch unreachable;
-                if (isIn(r, n)) seen.put(r, {}) catch unreachable;
+                if (isIn(t, n) and !seen[@intCast(t.x * n + t.y)]) {
+                    seen[@intCast(t.x * n + t.y)] = true;
+                    count += 1;
+                }
+                if (isIn(r, n) and !seen[@intCast(r.x * n + r.y)]) {
+                    seen[@intCast(r.x * n + r.y)] = true;
+                    count += 1;
+                }
             }
         }
     }
-    return seen.count();
+    return count;
 }
 
 fn isIn(point: Point, n: i32) bool {
@@ -63,8 +71,10 @@ fn isIn(point: Point, n: i32) bool {
 }
 
 fn part2(allocator: mem.Allocator, antenas: []std.ArrayList(Point), n: i32) u32 {
-    var seen = std.AutoHashMap(Point, void).init(allocator);
-    defer seen.deinit();
+    var seen = allocator.alloc(bool, @intCast(n * n)) catch unreachable;
+    @memset(seen, false);
+    defer allocator.free(seen);
+    var count: u32 = 0;
     for (antenas) |ants| {
         if (ants.items.len <= 1) continue;
         for (ants.items[1..], 1..) |a, i| {
@@ -81,19 +91,25 @@ fn part2(allocator: mem.Allocator, antenas: []std.ArrayList(Point), n: i32) u32 
                 // forward
                 var t = a;
                 while (isIn(t, n)) {
-                    seen.put(t, {}) catch unreachable;
+                    if (!seen[@intCast(t.x * n + t.y)]) {
+                        seen[@intCast(t.x * n + t.y)] = true;
+                        count += 1;
+                    }
                     t = Point{ .x = t.x + dx, .y = t.y + dy };
                 }
                 // backward
                 t = a; // okay to do a again
                 while (isIn(t, n)) {
-                    seen.put(t, {}) catch unreachable;
+                    if (!seen[@intCast(t.x * n + t.y)]) {
+                        seen[@intCast(t.x * n + t.y)] = true;
+                        count += 1;
+                    }
                     t = Point{ .x = t.x - dx, .y = t.y - dy };
                 }
             }
         }
     }
-    return seen.count();
+    return count;
 }
 
 test "sample" {
