@@ -90,3 +90,6 @@ commit 41f029d: search from the end to prune scenarios
 commit 10b473b:
   Time (mean ± σ):       1.3 ms ±   0.2 ms    [User: 0.3 ms, System: 0.7 ms]
   Range (min … max):     0.5 ms …   2.0 ms    3122 runs
+commit 3fec575: hashmap -> array
+  Time (mean ± σ):     707.9 µs ± 275.3 µs    [User: 234.8 µs, System: 284.1 µs]
+  Range (min … max):   252.1 µs … 1437.7 µs    6009 runs
