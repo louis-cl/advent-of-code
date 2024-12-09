@@ -8,7 +8,23 @@ const Solution = struct { p1: u64, p2: u64 };
 
 // input is assumed without \n at the end
 pub fn solve(this: *const @This()) !Solution {
-    return Solution{ .p1 = part1(this.allocator, this.input), .p2 = part2(this.allocator, this.input) };
+    std.debug.assert(this.input.len % 2 == 1); // last number is a file
+    const n = (this.input.len - 1) / 2;
+    // allocate double in one go
+    var files: []Chunk = this.allocator.alloc(Chunk, 2 * (n + 1)) catch unreachable;
+    var spaces: []Chunk = this.allocator.alloc(Chunk, 2 * n) catch unreachable;
+    defer this.allocator.free(files);
+    defer this.allocator.free(spaces);
+    var position: usize = 0;
+    for (this.input, 0..) |c, i| {
+        const chunk = Chunk{ .position = position, .size = c - '0' };
+        if (i % 2 == 0) files[i / 2] = chunk else spaces[i / 2] = chunk;
+        position += chunk.size;
+    }
+    @memcpy(files[n + 1 ..], files[0 .. n + 1]);
+    @memcpy(spaces[n..], spaces[0..n]);
+
+    return Solution{ .p1 = part1(files[0 .. n + 1], spaces[0..n]), .p2 = part2(files[n + 1 ..], spaces[n..]) };
 }
 
 const Chunk = struct {
@@ -21,20 +37,7 @@ const Chunk = struct {
     }
 };
 
-fn part1(allocator: mem.Allocator, disk: []const u8) u64 {
-    std.debug.assert(disk.len % 2 == 1); // make sure last number is a file
-    const n = (disk.len - 1) / 2;
-    var files: []Chunk = allocator.alloc(Chunk, n + 1) catch unreachable;
-    var spaces: []Chunk = allocator.alloc(Chunk, n) catch unreachable;
-    defer allocator.free(files);
-    defer allocator.free(spaces);
-    var position: usize = 0;
-    for (disk, 0..) |c, i| {
-        const chunk = Chunk{ .position = position, .size = c - '0' };
-        if (i % 2 == 0) files[i / 2] = chunk else spaces[i / 2] = chunk;
-        position += chunk.size;
-    }
-
+fn part1(files: []Chunk, spaces: []Chunk) u64 {
     var checksum: u64 = 0;
     var next_space: usize = 0;
     var next_file = files.len - 1;
@@ -57,37 +60,10 @@ fn part1(allocator: mem.Allocator, disk: []const u8) u64 {
     for (0..next_file + 1) |i| {
         checksum += files[i].positionSum() * i;
     }
-
-    //     var space = this.disk[2 * this.id_left - 1];
-    // while (space > 0 and this.id_right >= this.id_left) {
-    //     const size = this.fileSize(this.id_right);
-    //     const fill_size = @min(space, size);
-    //     space -= fill_size;
-    //     this.addChecksum(this.id_right, fill_size);
-    //     if (fill_size == size) {
-    //         this.id_right -= 1;
-    //     } else {
-    //         this.disk[2 * this.id_right] = size - fill_size;
-    //     }
-    // }
-
     return checksum;
 }
 
-fn part2(allocator: mem.Allocator, disk: []const u8) u64 {
-    std.debug.assert(disk.len % 2 == 1); // make sure last block is a file
-    const n = (disk.len - 1) / 2;
-    var files: []Chunk = allocator.alloc(Chunk, n + 1) catch unreachable;
-    var spaces: []Chunk = allocator.alloc(Chunk, n) catch unreachable;
-    defer allocator.free(files);
-    defer allocator.free(spaces);
-    var position: usize = 0;
-    for (disk, 0..) |c, i| {
-        const chunk = Chunk{ .position = position, .size = c - '0' };
-        if (i % 2 == 0) files[i / 2] = chunk else spaces[i / 2] = chunk;
-        position += chunk.size;
-    }
-
+fn part2(files: []Chunk, spaces: []Chunk) u64 {
     var checksum: u64 = 0;
     var id = files.len - 1;
     while (true) : (id -= 1) {
