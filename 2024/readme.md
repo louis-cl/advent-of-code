@@ -93,3 +93,8 @@ commit 10b473b:
 commit 3fec575: hashmap -> array
   Time (mean ± σ):     707.9 µs ± 275.3 µs    [User: 234.8 µs, System: 284.1 µs]
   Range (min … max):   252.1 µs … 1437.7 µs    6009 runs
+
+## Day 9
+commit 4819ad9:
+  Time (mean ± σ):      11.5 ms ±   1.4 ms    [User: 11.0 ms, System: 0.4 ms]
+  Range (min … max):    10.5 ms …  17.4 ms    273 runs
