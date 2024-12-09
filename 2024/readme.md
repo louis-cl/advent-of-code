@@ -64,7 +64,7 @@ commit 6fc6c4c:
   Time (mean ± σ):       1.2 ms ±   0.2 ms    [User: 0.3 ms, System: 0.6 ms]
   Range (min … max):     0.5 ms …   2.1 ms    2850 runs
 
-## Day 6 releaseSafe!
+## Day 6
 commit 1478536: done with release safe flag, otherwise after 12min it didn't finish 1 warmup run
   Time (mean ± σ):      6.386 s ±  0.357 s    [User: 6.144 s, System: 0.242 s]
   Range (min … max):    6.020 s …  6.872 s    10 runs
@@ -77,6 +77,9 @@ commit 3390ebe: reuse hashmap in cycles check instead of creating a new one
 commit c465f59: replace hashmap for visited by an array
   Time (mean ± σ):      60.8 ms ±   1.7 ms    [User: 60.0 ms, System: 0.5 ms]
   Range (min … max):    59.6 ms …  67.8 ms    49 runs
+commit cf59148: done with releaseFast after fixing memory initialization
+  Time (mean ± σ):      22.0 ms ±   0.3 ms    [User: 21.4 ms, System: 0.4 ms]
+  Range (min … max):    21.7 ms …  23.6 ms    138 runs
 
 ## Day 7
 commit 89f9849:
