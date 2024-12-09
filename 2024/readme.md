@@ -104,3 +104,6 @@ commit 3cbae5e: parse and allocate once (with memcpy), interestingly not improvi
 commit 7652b4d: failing to find a space for file size S => we will fail for size >= S
   Time (mean ± σ):       6.2 ms ±   1.5 ms    [User: 5.6 ms, System: 0.4 ms]
   Range (min … max):     3.3 ms …  14.1 ms    470 runs
+commit b9b3d37: finding a space for size S at index x => next space of size >= S (if exists) is at index > x 
+  Time (mean ± σ):       1.3 ms ±   0.5 ms    [User: 0.5 ms, System: 0.7 ms]
+  Range (min … max):     0.6 ms …   2.7 ms    4005 runs
