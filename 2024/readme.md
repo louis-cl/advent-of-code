@@ -98,3 +98,6 @@ commit 3fec575: hashmap -> array
 commit 4819ad9:
   Time (mean ± σ):      11.5 ms ±   1.4 ms    [User: 11.0 ms, System: 0.4 ms]
   Range (min … max):    10.5 ms …  17.4 ms    273 runs
+commit 3cbae5e: parse and allocate once (with memcpy), interestingly not improving much
+  Time (mean ± σ):      11.4 ms ±   1.2 ms    [User: 10.8 ms, System: 0.4 ms]
+  Range (min … max):    10.5 ms …  16.9 ms    198 runs
