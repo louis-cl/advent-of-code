@@ -6,7 +6,7 @@ setup:
 	$(ZIG_BUILD) -Dday=$(day) setup
 
 run:
-	$(ZIG_BUILD) -Dday=$(day) run -Doptimize=ReleaseSafe
+	$(ZIG_BUILD) -Dday=$(day) run
 
 test:
 	$(ZIG_BUILD) -Dday=$(day) test
@@ -14,6 +14,10 @@ test:
 perf:
 	$(ZIG_BUILD) -Dday=$(day) $(OPTIMIZE_FLAG)
 	hyperfine --shell=none --warmup 3 '$(EXECUTABLE)'
+
+callgrind:
+	$(ZIG_BUILD) -Dday=$(day) -Doptimize=ReleaseSafe
+	valgrind --tool=callgrind $(EXECUTABLE)
 
 setup_%:
 	$(MAKE) --no-print-directory setup day=$*
@@ -26,3 +30,6 @@ test_%:
 
 perf_%:
 	$(MAKE) --no-print-directory perf day=$*
+
+callgrind_%:
+	$(MAKE) --no-print-directory callgrind day=$*
