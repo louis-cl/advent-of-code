@@ -56,8 +56,9 @@ pub fn solve(this: *const @This()) !Solution {
                 '#' => map.set(x, @intCast(y), Cell.block),
                 '^' => {
                     start = State{ .x = x, .y = @intCast(y), .dx = -1, .dy = 0 };
+                    map.set(x, @intCast(y), Cell.free);
                 },
-                else => {},
+                else => map.set(x, @intCast(y), Cell.free),
             }
         }
         x += 1;
@@ -73,7 +74,7 @@ fn part1(map: Map, start: State) u32 {
     var p = start;
     var count: u32 = 0;
     while (true) {
-        // std.debug.print("guard at {d},{d}\n", .{ x, y });
+        // std.debug.print("guard at {any}\n", .{p});
         const next = p.next();
         if (!map.contains(next.x, next.y)) break;
         switch (map.get(next.x, next.y)) {
