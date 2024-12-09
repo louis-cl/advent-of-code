@@ -101,3 +101,6 @@ commit 4819ad9:
 commit 3cbae5e: parse and allocate once (with memcpy), interestingly not improving much
   Time (mean ± σ):      11.4 ms ±   1.2 ms    [User: 10.8 ms, System: 0.4 ms]
   Range (min … max):    10.5 ms …  16.9 ms    198 runs
+commit 7652b4d: failing to find a space for file size S => we will fail for size >= S
+  Time (mean ± σ):       6.2 ms ±   1.5 ms    [User: 5.6 ms, System: 0.4 ms]
+  Range (min … max):     3.3 ms …  14.1 ms    470 runs
