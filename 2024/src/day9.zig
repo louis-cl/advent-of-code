@@ -66,19 +66,24 @@ fn part1(files: []Chunk, spaces: []Chunk) u64 {
 fn part2(files: []Chunk, spaces: []Chunk) u64 {
     var checksum: u64 = 0;
     // failing to find a space for file size S => we will fail for size >= S (i.e the gaps get smaller)
-    var failed: [10]bool = [_]bool{false} ** 10; // max 10 sizes
+    var failed = [_]bool{false} ** 10; // max 10 sizes
+    // finding a space for size S at index x => next space of size >= S is at index > x (if exists)
+    var min_sp = [_]usize{0} ** 10;
+
     var id = files.len - 1;
     while (true) : (id -= 1) {
         // find space for file id
         const size = files[id].size;
         if (!failed[size]) {
-            var sp: usize = 0;
+            var sp: usize = min_sp[size];
             while (sp < id and spaces[sp].size < size) sp += 1;
             if (sp < id) { // move file id to space sp
                 // std.debug.print("file {d} goes to space {d}\n", .{ id, sp });
                 files[id].position = spaces[sp].position;
                 spaces[sp].size -= files[id].size;
                 spaces[sp].position += files[id].size;
+                min_sp[size] = sp;
+                // for (size..10) |s| min_sp[s] = @max(min_sp[s], sp); this is not better than above
             } else {
                 for (size..10) |s| failed[s] = true;
             }
