@@ -65,17 +65,23 @@ fn part1(files: []Chunk, spaces: []Chunk) u64 {
 
 fn part2(files: []Chunk, spaces: []Chunk) u64 {
     var checksum: u64 = 0;
+    // failing to find a space for file size S => we will fail for size >= S (i.e the gaps get smaller)
+    var failed: [10]bool = [_]bool{false} ** 10; // max 10 sizes
     var id = files.len - 1;
     while (true) : (id -= 1) {
         // find space for file id
         const size = files[id].size;
-        var sp: usize = 0;
-        while (sp < id and spaces[sp].size < size) sp += 1;
-        if (sp < id) { // move file id to space sp
-            // std.debug.print("file {d} goes to space {d}\n", .{ id, sp });
-            files[id].position = spaces[sp].position;
-            spaces[sp].size -= files[id].size;
-            spaces[sp].position += files[id].size;
+        if (!failed[size]) {
+            var sp: usize = 0;
+            while (sp < id and spaces[sp].size < size) sp += 1;
+            if (sp < id) { // move file id to space sp
+                // std.debug.print("file {d} goes to space {d}\n", .{ id, sp });
+                files[id].position = spaces[sp].position;
+                spaces[sp].size -= files[id].size;
+                spaces[sp].position += files[id].size;
+            } else {
+                for (size..10) |s| failed[s] = true;
+            }
         }
         checksum += id * files[id].positionSum();
         if (id == 0) break; // because id is usize it can't go negative
