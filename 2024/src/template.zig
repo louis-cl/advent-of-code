@@ -11,9 +11,7 @@ pub fn solve(this: *const @This()) !Solution {
     while (iter.next()) |line| {
         if (line.len == 0) break;
     }
-    const p1: u32 = 0;
-    const p2: u32 = 0;
-    return Solution{ .p1 = p1, .p2 = p2 };
+    return Solution{ .p1 = 0, .p2 = 0 };
 }
 
 test "sample" {
