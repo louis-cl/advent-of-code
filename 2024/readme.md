@@ -142,6 +142,7 @@ Range (min … max): 0.5 ms … 2.0 ms (3122 runs)
 Time (mean ± σ): 707.9 µs ± 275.3 µs [User: 234.8 µs, System: 284.1 µs]
 Range (min … max): 252.1 µs … 1437.7 µs (6009 runs)
 ```
+
 ## Day 9
 
 **commit 4819ad9**
@@ -164,6 +165,7 @@ Range (min … max): 3.3 ms … 14.1 ms (470 runs)
 Time (mean ± σ): 1.3 ms ± 0.5 ms [User: 0.5 ms, System: 0.7 ms]
 Range (min … max): 0.6 ms … 2.7 ms (4005 runs)
 ```
+
 ## Day 10
 
 **commit 691edaf**
@@ -175,4 +177,12 @@ Range (min … max): 296.2 µs … 2553.1 µs (5473 runs)
 ```
 Time (mean ± σ):     616.6 µs ± 190.2 µs    [User: 383.6 µs, System: 132.3 µs]
 Range (min … max):   346.8 µs … 1886.1 µs    4816 runs
+```
+
+## Day 11
+
+**commit 6d7bc68**
+```
+Time (mean ± σ):      13.4 ms ±   1.3 ms    [User: 10.9 ms, System: 2.3 ms]
+Range (min … max):     9.9 ms …  17.5 ms    233 runs
 ```
