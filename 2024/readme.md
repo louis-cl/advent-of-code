@@ -186,3 +186,10 @@ Range (min … max):   346.8 µs … 1886.1 µs    4816 runs
 Time (mean ± σ):      13.4 ms ±   1.3 ms    [User: 10.9 ms, System: 2.3 ms]
 Range (min … max):     9.9 ms …  17.5 ms    233 runs
 ```
+
+## Day 12
+**commit 811993d**
+```
+Time (mean ± σ):       2.0 ms ±   0.8 ms    [User: 1.6 ms, System: 0.3 ms]
+Range (min … max):     1.3 ms …   5.5 ms    744 runs
+```
