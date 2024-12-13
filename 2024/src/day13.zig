@@ -28,9 +28,9 @@ pub fn solve(this: *const @This()) !Solution {
 
 fn parseLine(line: []const u8) vec2 {
     var iter = mem.splitAny(u8, line, "+,=");
-    _ = iter.next().?; // "Button A: X+"
+    _ = iter.next().?; // "Button A: X+" or "Prize: X="
     const x = std.fmt.parseUnsigned(i64, iter.next().?, 10) catch unreachable;
-    _ = iter.next().?; // ", Y+"
+    _ = iter.next().?; // ", Y+" or ", Y="
     const y = std.fmt.parseUnsigned(i64, iter.next().?, 10) catch unreachable;
     return vec2{ x, y };
 }
