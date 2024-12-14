@@ -200,3 +200,10 @@ Range (min … max):     1.3 ms …   5.5 ms    744 runs
 Time (mean ± σ):     529.4 µs ± 292.6 µs    [User: 222.7 µs, System: 162.7 µs]
 Range (min … max):   162.9 µs … 1519.5 µs    9435 runs
 ```
+
+## Day 14
+**commit dfbb2ca**
+```
+Time (mean ± σ):      31.2 ms ±   0.2 ms    [User: 26.7 ms, System: 4.3 ms]
+Range (min … max):    31.0 ms …  32.4 ms    95 runs
+```
