@@ -214,3 +214,10 @@ Range (min … max):    31.0 ms …  32.4 ms    95 runs
 Time (mean ± σ):       1.3 ms ±   0.6 ms    [User: 1.0 ms, System: 0.2 ms]
 Range (min … max):     0.8 ms …   3.6 ms    2870 runs
 ```
+
+## Day 16
+**commit 0c44deb**
+```
+Time (mean ± σ):       4.3 ms ±   1.1 ms    [User: 3.8 ms, System: 0.3 ms]
+Range (min … max):     2.9 ms …  11.5 ms    815 runs
+```
