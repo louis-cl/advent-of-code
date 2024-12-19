@@ -243,3 +243,9 @@ Time (mean ± σ):      44.6 ms ±   2.4 ms    [User: 43.8 ms, System: 0.5 ms]
 Range (min … max):    41.1 ms …  49.2 ms    71 runs
 ```
 65% of my time is doing string equality
+
+**commit a223fcf**: Find next cut in hashmap instead of looping over all towels
+```
+Time (mean ± σ):       6.9 ms ±   0.6 ms    [User: 6.1 ms, System: 0.5 ms]
+Range (min … max):     6.0 ms …  10.4 ms    345 runs
+```
