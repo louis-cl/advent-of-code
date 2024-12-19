@@ -242,3 +242,4 @@ Range (min … max):   378.2 µs … 2735.0 µs    4725 runs
 Time (mean ± σ):      44.6 ms ±   2.4 ms    [User: 43.8 ms, System: 0.5 ms]
 Range (min … max):    41.1 ms …  49.2 ms    71 runs
 ```
+65% of my time is doing string equality

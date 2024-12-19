@@ -6,16 +6,36 @@ allocator: mem.Allocator,
 
 const Solution = struct { p1: u64, p2: u64 };
 
-const Towels = std.ArrayList([]const u8);
+// input is using alphabet rbgwu
+// fn encodeChar(c: u8) u3 {
+//     switch (c) {
+//         'r' => 0,
+//         'b' => 1,
+//         'g' => 2,
+//         'w' => 3,
+//         'u' => 4,
+//         else => unreachable,
+//     }
+// }
+
+const Towels = struct {
+    options: std.StringHashMap(void),
+    max_len: usize,
+};
+
 pub fn solve(this: *const @This()) !Solution {
     // parse towels
-    var towels = Towels.init(this.allocator);
-    defer towels.deinit();
+    var towels = Towels{ .options = std.StringHashMap(void).init(this.allocator), .max_len = 0 };
+    defer towels.options.deinit();
 
     var lines = mem.splitScalar(u8, this.input, '\n');
     var towel_line = mem.splitSequence(u8, lines.next().?, ", ");
-    while (towel_line.next()) |towel| try towels.append(towel);
+    while (towel_line.next()) |towel| {
+        try towels.options.put(towel, {});
+        towels.max_len = @max(towels.max_len, towel.len);
+    }
 
+    // solve
     var p1: u64 = 0;
     var p2: u64 = 0;
     while (lines.next()) |line| {
@@ -40,9 +60,9 @@ fn compute(partial: []?u64, towels: *Towels, design: []const u8) u64 {
     if (design.len == 0) return 1;
     if (partial[0]) |r| return r;
     var total: u64 = 0;
-    for (towels.items) |towel| {
-        if (!std.mem.startsWith(u8, design, towel)) continue;
-        const rest = compute(partial[towel.len..], towels, design[towel.len..]);
+    for (1..@min(towels.max_len + 1, design.len + 1)) |i| {
+        if (!towels.options.contains(design[0..i])) continue;
+        const rest = compute(partial[i..], towels, design[i..]);
         total += rest;
     }
     partial[0] = total;
