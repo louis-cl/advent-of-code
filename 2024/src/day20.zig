@@ -92,16 +92,18 @@ fn part2(grid: *Grid, from: vec2, end: vec2) u32 {
 fn shortcuts2(grid: *Grid, from: vec2, time: i32) u32 {
     var count: u32 = 0;
     const radius: i16 = 20;
-    var di = -radius;
-    while (di <= radius) : (di += 1) {
-        const distI = @as(i16, @intCast(@abs(di)));
-        var dj = distI - radius;
-        while (dj + distI <= radius) : (dj += 1) {
-            const next = from + vec2{ di, dj };
-            if (!grid.contains(next)) continue; // out
+    var i = @max(0, from[0] - radius);
+    const maxi = @min(@as(i16, @intCast(grid.width)) - 1, from[0] + radius);
+    while (i <= maxi) : (i += 1) {
+        const distI = @as(i16, @intCast(@abs(i - from[0])));
+        var j = @max(0, from[1] + distI - radius);
+        const maxj = @min(@as(i16, @intCast(grid.width)) - 1, from[1] + radius - distI);
+        while (j <= maxj) : (j += 1) {
+            const next = vec2{ i, j };
+            std.debug.assert(grid.contains(next));
             const next_time = grid.atP(next).*;
             if (next_time == -1) continue; // wall
-            const new_time = time + distI + @abs(dj);
+            const new_time = time + distI + @abs(j - from[1]);
             if (new_time < next_time) { // shortcut!
                 const savings = next_time - new_time;
                 if (savings >= 100) {
