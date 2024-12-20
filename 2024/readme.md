@@ -256,3 +256,8 @@ Range (min … max):     6.0 ms …  10.4 ms    345 runs
 Time (mean ± σ):      40.3 ms ±   0.3 ms    [User: 39.6 ms, System: 0.5 ms]
 Range (min … max):    40.0 ms …  41.4 ms    74 runs
 ```
+**commit 91d5802**: don't search outside of the map
+```
+Time (mean ± σ):      24.3 ms ±   0.8 ms    [User: 23.3 ms, System: 0.8 ms]
+Range (min … max):    15.7 ms …  25.4 ms    123 runs
+```
