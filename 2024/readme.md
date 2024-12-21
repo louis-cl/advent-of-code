@@ -261,3 +261,10 @@ Range (min … max):    40.0 ms …  41.4 ms    74 runs
 Time (mean ± σ):      24.3 ms ±   0.8 ms    [User: 23.3 ms, System: 0.8 ms]
 Range (min … max):    15.7 ms …  25.4 ms    123 runs
 ```
+
+## Day 21
+**commit c67badd**
+```
+Time (mean ± σ):       1.0 ms ±   0.2 ms    [User: 0.2 ms, System: 0.5 ms]
+Range (min … max):     0.4 ms …   1.5 ms    3353 runs
+```
