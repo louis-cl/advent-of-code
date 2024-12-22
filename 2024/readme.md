@@ -268,3 +268,10 @@ Range (min … max):    15.7 ms …  25.4 ms    123 runs
 Time (mean ± σ):       1.0 ms ±   0.2 ms    [User: 0.2 ms, System: 0.5 ms]
 Range (min … max):     0.4 ms …   1.5 ms    3353 runs
 ```
+
+## Day 22
+**commit bf71142**
+```
+Time (mean ± σ):      26.9 ms ±   0.2 ms    [User: 26.3 ms, System: 0.4 ms]
+Range (min … max):    26.7 ms …  28.2 ms    111 runs
+```
