@@ -275,3 +275,10 @@ Range (min … max):     0.4 ms …   1.5 ms    3353 runs
 Time (mean ± σ):      26.9 ms ±   0.2 ms    [User: 26.3 ms, System: 0.4 ms]
 Range (min … max):    26.7 ms …  28.2 ms    111 runs
 ```
+
+## Day 23
+**commit 736d58d** very slow implementation
+```
+Time (mean ± σ):     17.180 s ±  0.074 s    [User: 17.183 s, System: 0.001 s]
+Range (min … max):   17.047 s … 17.285 s    10 runs
+```
