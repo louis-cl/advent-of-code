@@ -284,7 +284,11 @@ Range (min … max):   17.047 s … 17.285 s    10 runs
 ```
 
 ## Day 24
-Done manually part2, need to find a way to work for all input
+**commit 4eb057a**: part1 only as part2 was manual
+```
+Time (mean ± σ):     708.2 µs ± 239.0 µs    [User: 427.1 µs, System: 168.5 µs]
+Range (min … max):   327.9 µs … 2099.4 µs    5151 runs
+```
 
 ## Day 25
 **commit 27553e3**
