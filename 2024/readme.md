@@ -282,3 +282,13 @@ Range (min … max):    26.7 ms …  28.2 ms    111 runs
 Time (mean ± σ):     17.180 s ±  0.074 s    [User: 17.183 s, System: 0.001 s]
 Range (min … max):   17.047 s … 17.285 s    10 runs
 ```
+
+## Day 24
+Done manually part2, need to find a way to work for all input
+
+## Day 25
+**commit 27553e3**
+```
+Time (mean ± σ):     946.9 µs ± 349.7 µs    [User: 630.0 µs, System: 210.1 µs]
+Range (min … max):   412.9 µs … 2735.7 µs    3638 runs
+```
