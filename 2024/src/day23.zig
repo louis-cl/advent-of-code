@@ -7,74 +7,7 @@ allocator: mem.Allocator,
 const Solution = struct { p1: u32, p2: u32 };
 
 const MAX_VERTICES = 26 * 26; // 2 lowercase letter
-const ADJ = @Vector(MAX_VERTICES, u1);
-
-pub fn solve(this: *const @This()) !Solution {
-    var iter = mem.splitScalar(u8, this.input, '\n');
-    var graph: []ADJ = try this.allocator.alloc(ADJ, MAX_VERTICES);
-    @memset(graph, @splat(0));
-    defer this.allocator.free(graph);
-
-    var nodes: ADJ = @splat(0);
-    while (iter.next()) |line| {
-        if (line.len == 0) break;
-        const left = vertex(line);
-        const right = vertex(line[3..]);
-        graph[left][right] = 1;
-        graph[right][left] = 1;
-        nodes[left] = 1;
-        nodes[right] = 1;
-    }
-    return Solution{ .p1 = part1(graph), .p2 = part2(graph, nodes) };
-}
-
-fn part2(graph: []const ADJ, nodes: ADJ) u32 {
-    const res = bk(graph, @splat(0), nodes, @splat(0)).?;
-    for (0..graph.len) |i| {
-        if (res[i] == 0) continue;
-        std.debug.print("clique has {s}\n", .{name(i)});
-    }
-    return std.simd.countElementsWithValue(res, 1);
-}
-
-fn bk(graph: []const ADJ, in: ADJ, maybe: ADJ, out: ADJ) ?ADJ {
-    if (std.simd.countElementsWithValue(maybe, 1) == 0 and std.simd.countElementsWithValue(out, 1) == 0) {
-        return in;
-    }
-    var max_clique: ADJ = undefined;
-    var max_clique_size: usize = 0;
-    var current_maybe = maybe;
-    var current_out = out;
-    for (0..graph.len) |i| {
-        if (current_maybe[i] == 0) continue;
-        var new_in = in;
-        new_in[i] = 1;
-        if (bk(graph, new_in, current_maybe & graph[i], current_out & graph[i])) |res| {
-            const size = std.simd.countElementsWithValue(res, 1);
-            if (max_clique_size < size) {
-                max_clique_size = size;
-                max_clique = res;
-            }
-        }
-        current_maybe[i] = 0;
-        current_out[i] = 1;
-    }
-    return if (max_clique_size > 0) max_clique else null;
-}
-
-fn part1(graph: []ADJ) u32 {
-    const n = graph.len;
-    var res: u32 = 0;
-    for (0..26) |i| {
-        for (i..n) |j| {
-            if (graph[i][j] == 0) continue;
-            for (j..n) |k| {
-                if (graph[i][k] == 1 and graph[j][k] == 1) res += 1;
-            }
-        }
-    }
-    return res;
-}
+const NodeSet = std.AutoHashMap(usize, void);
 
 fn name(i: usize) [2]u8 {
     var res: [2]u8 = undefined;
@@ -95,6 +28,101 @@ fn vertex(a: []const u8) usize {
         else => a[0] - 'a',
     };
     return first * 26 + a[1] - 'a';
+}
+
+pub fn solve(this: *const @This()) !Solution {
+    var iter = mem.splitScalar(u8, this.input, '\n');
+    var graph: []NodeSet = try this.allocator.alloc(NodeSet, MAX_VERTICES);
+    for (0..MAX_VERTICES) |i| graph[i] = NodeSet.init(this.allocator);
+    defer {
+        for (0..MAX_VERTICES) |i| graph[i].deinit();
+        this.allocator.free(graph);
+    }
+
+    while (iter.next()) |line| {
+        if (line.len == 0) break;
+        const left = vertex(line);
+        const right = vertex(line[3..]);
+        try graph[left].put(right, {});
+        try graph[right].put(left, {});
+    }
+    return Solution{
+        .p1 = part1(graph), //
+        .p2 = try part2(graph),
+    };
+}
+
+const MaxClique = struct {
+    best: NodeSet,
+    graph: []const NodeSet,
+    fn find(graph: []const NodeSet) !MaxClique {
+        var empty = NodeSet.init(graph[0].allocator);
+        defer empty.deinit();
+        var c = MaxClique{ .best = try empty.clone(), .graph = graph };
+        var nodes = try empty.clone();
+        // nodes.ensureTotalCapacity(MAX_VERTICES);
+        defer nodes.deinit();
+        for (graph, 0..) |adj, i| {
+            if (adj.count() > 0) try nodes.put(i, {});
+        }
+        try c.clique(&empty, &nodes);
+        return c;
+    }
+
+    fn clique(this: *@This(), c: *NodeSet, p: *NodeSet) !void {
+        if (c.count() > this.best.count()) {
+            this.best.deinit();
+            this.best = try c.clone();
+        }
+        if (c.count() + p.count() <= this.best.count()) return;
+        var current_p = try p.clone();
+        defer current_p.deinit();
+        var it = p.keyIterator();
+        while (it.next()) |next| {
+            // clique(c + next, current_p & neighbours(next))
+            _ = current_p.remove(next.*);
+            try c.put(next.*, {});
+            var p2 = try intersection(&current_p, &this.graph[next.*]);
+            defer p2.deinit();
+            try this.clique(c, &p2);
+            _ = c.remove(next.*);
+        }
+    }
+
+    fn intersection(a: *const NodeSet, b: *const NodeSet) !NodeSet {
+        if (b.count() < a.count()) return intersection(b, a);
+        var res = try a.clone();
+        var it = a.keyIterator();
+        while (it.next()) |v| {
+            if (!b.contains(v.*)) _ = res.remove(v.*);
+        }
+        return res;
+    }
+};
+
+fn part2(graph: []const NodeSet) !u32 {
+    var max = try MaxClique.find(graph);
+    var it = max.best.keyIterator();
+    while (it.next()) |v| {
+        std.debug.print("max clique contains {s}\n", .{name(v.*)});
+    }
+    const res = max.best.count();
+    max.best.deinit();
+    return res;
+}
+
+fn part1(graph: []const NodeSet) u32 {
+    const n = graph.len;
+    var res: u32 = 0;
+    for (0..26) |i| { // only t
+        for (i..n) |j| {
+            if (!graph[i].contains(j)) continue;
+            for (j..n) |k| {
+                if (graph[i].contains(k) and graph[j].contains(k)) res += 1;
+            }
+        }
+    }
+    return res;
 }
 
 test "sample" {
