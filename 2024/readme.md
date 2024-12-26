@@ -282,6 +282,11 @@ Range (min … max):    26.7 ms …  28.2 ms    111 runs
 Time (mean ± σ):     17.180 s ±  0.074 s    [User: 17.183 s, System: 0.001 s]
 Range (min … max):   17.047 s … 17.285 s    10 runs
 ```
+**commit bfbb014** replace arrays with sets & more allocations (they are small)
+```
+Time (mean ± σ):       2.2 ms ±   0.5 ms    [User: 1.7 ms, System: 0.4 ms]
+Range (min … max):     1.8 ms …   4.8 ms    1393 runs
+```
 
 ## Day 24
 **commit 4eb057a**: part1 only as part2 was manual
