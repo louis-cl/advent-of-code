@@ -1,26 +1,20 @@
 ZIG_BUILD=zig build
 OPTIMIZE_FLAG=-Doptimize=ReleaseFast
-EXECUTABLE=./zig-out/bin/aoc.zig
-
-setup:
-	$(ZIG_BUILD) -Dday=$(day) setup
+EXECUTABLE_DIR=./zig-out/bin
 
 run:
-	$(ZIG_BUILD) -Dday=$(day) run
+	$(ZIG_BUILD) day$(day)
 
 test:
-	$(ZIG_BUILD) -Dday=$(day) test
+	$(ZIG_BUILD) day$(day)_test
 
 perf:
-	$(ZIG_BUILD) -Dday=$(day) $(OPTIMIZE_FLAG)
-	hyperfine --shell=none --warmup 3 '$(EXECUTABLE)'
+	$(ZIG_BUILD) day$(day)_install -Doptimize=ReleaseFast
+	hyperfine --shell=none --warmup 3 '$(EXECUTABLE_DIR)/day$(day)'
 
-callgrind:
-	$(ZIG_BUILD) -Dday=$(day) -Doptimize=ReleaseSafe
-	valgrind --tool=callgrind $(EXECUTABLE)
-
-setup_%:
-	$(MAKE) --no-print-directory setup day=$*
+prof:
+	$(ZIG_BUILD) day$(day)_install -Doptimize=ReleaseSafe
+	valgrind --tool=callgrind $(EXECUTABLE_DIR)/day$(day)
 
 run_%:
 	$(MAKE) --no-print-directory run day=$*
@@ -28,8 +22,8 @@ run_%:
 test_%:
 	$(MAKE) --no-print-directory test day=$*
 
-perf_%:
+bench_%:
 	$(MAKE) --no-print-directory perf day=$*
 
-callgrind_%:
-	$(MAKE) --no-print-directory callgrind day=$*
+prof_%:
+	$(MAKE) --no-print-directory prof day=$*

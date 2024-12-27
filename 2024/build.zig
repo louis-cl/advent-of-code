@@ -47,7 +47,11 @@ pub fn build(b: *Build) !void {
             .root_source_file = b.path(zigFile),
         });
         exe.root_module.addAnonymousImport("input", .{ .root_source_file = b.path(b.fmt("input/{s}.txt", .{dayName})) });
-        // b.addInstallArtifact(exe, .{});
+
+        // install
+        const install_cmd = b.addInstallArtifact(exe, .{});
+        const install_step = b.step(b.fmt("{s}_install", .{dayName}), b.fmt("Install {s}", .{dayName}));
+        install_step.dependOn(&install_cmd.step);
 
         // test
         const build_test = b.addTest(.{
@@ -56,7 +60,7 @@ pub fn build(b: *Build) !void {
             .optimize = optimize,
         });
         const run_test = b.addRunArtifact(build_test);
-        const test_step = b.step(b.fmt("test{d}", .{day}), b.fmt("Run tests for {s}", .{dayName}));
+        const test_step = b.step(b.fmt("{s}_test", .{dayName}), b.fmt("Run tests for {s}", .{dayName}));
         test_step.dependOn(&run_test.step);
 
         // run
