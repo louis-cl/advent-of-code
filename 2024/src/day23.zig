@@ -5,7 +5,6 @@ input: []const u8,
 allocator: mem.Allocator,
 
 const Solution = struct { p1: u32, p2: u32 };
-
 const MAX_VERTICES = 26 * 26; // 2 lowercase letter
 const NodeSet = std.AutoHashMap(usize, void);
 
@@ -55,12 +54,13 @@ pub fn solve(this: *const @This()) !Solution {
 const MaxClique = struct {
     best: NodeSet,
     graph: []const NodeSet,
+
+    // Carraghan & Pardalos algorithm, i.e. a branch and bound search
     fn find(graph: []const NodeSet) !MaxClique {
         var empty = NodeSet.init(graph[0].allocator);
         defer empty.deinit();
         var c = MaxClique{ .best = try empty.clone(), .graph = graph };
         var nodes = try empty.clone();
-        // nodes.ensureTotalCapacity(MAX_VERTICES);
         defer nodes.deinit();
         for (graph, 0..) |adj, i| {
             if (adj.count() > 0) try nodes.put(i, {});
