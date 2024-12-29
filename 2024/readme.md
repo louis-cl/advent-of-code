@@ -214,6 +214,12 @@ Time (mean ± σ):      24.6 ms ±   0.2 ms    [User: 20.0 ms, System: 4.4 ms]
 Range (min … max):    24.4 ms …  25.9 ms    122 runs
 ```
 
+**commit 07e02f3** compute x and y separately and use chinese remainder theorem
+```
+Time (mean ± σ):     616.6 µs ± 174.4 µs    [User: 390.5 µs, System: 128.4 µs]
+Range (min … max):   311.7 µs … 1886.2 µs    3615 runs
+```
+
 ## Day 15
 **commit 4018a29**
 ```
