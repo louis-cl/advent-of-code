@@ -18,12 +18,12 @@ pub fn main() !void {
     };
 
     const sol = try problem.solve();
-    try stdout.print(switch (@TypeOf(sol.p1)) {
+    try stdout.print("Part 1: " ++ switch (@TypeOf(sol.p1)) {
         []const u8 => "{s}",
         else => "{any}",
     } ++ "\n", .{sol.p1});
 
-    try stdout.print(switch (@TypeOf(sol.p2)) {
+    try stdout.print("Part 2: " ++ switch (@TypeOf(sol.p2)) {
         []const u8 => "{s}",
         else => "{any}",
     } ++ "\n", .{sol.p2});

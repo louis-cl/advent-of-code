@@ -6,6 +6,9 @@ zig-out/
 /build-*/
 /docgen_tmp/
 
+# Cache for benchmark table
+.benchmark_results.json
+
 # AOC policy
 input
 

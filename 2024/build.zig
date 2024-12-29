@@ -32,6 +32,8 @@ pub fn build(b: *Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const install_all = b.step("all_install", "Install all days");
+
     for (1..26) |day| {
         const dayName = b.fmt("day{d}", .{day});
         const zigFile = b.fmt("src/{s}.zig", .{dayName});
@@ -52,6 +54,7 @@ pub fn build(b: *Build) !void {
         const install_cmd = b.addInstallArtifact(exe, .{});
         const install_step = b.step(b.fmt("{s}_install", .{dayName}), b.fmt("Install {s}", .{dayName}));
         install_step.dependOn(&install_cmd.step);
+        install_all.dependOn(&install_cmd.step);
 
         // test
         const build_test = b.addTest(.{

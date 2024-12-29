@@ -25,5 +25,10 @@ test_%:
 bench_%:
 	$(MAKE) --no-print-directory perf day=$*
 
+prof_all:
+	$(ZIG_BUILD) all_install -Doptimize=ReleaseFast
+	hyperfine -N --parameter-scan day 1 25 -D 1 './zig-out/bin/day{day}'
+
 prof_%:
 	$(MAKE) --no-print-directory prof day=$*
+
