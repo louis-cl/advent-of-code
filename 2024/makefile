@@ -16,6 +16,9 @@ prof:
 	$(ZIG_BUILD) day$(day)_install -Doptimize=ReleaseSafe
 	valgrind --tool=callgrind $(EXECUTABLE_DIR)/day$(day)
 
+table:
+	python3 table.py
+
 run_%:
 	$(MAKE) --no-print-directory run day=$*
 
