@@ -4,14 +4,14 @@ const mem = std.mem;
 input: []const u8,
 allocator: mem.Allocator,
 
-const Solution = struct { p1: u32, p2: u32 };
+const Solution = struct { p1: u32, p2: i64 };
 const vec2 = @Vector(2, u32);
 
 const RobotMap = struct {
     robots: std.ArrayList([2]vec2),
-    width: u32,
-    height: u32,
-    fn init(allocator: mem.Allocator, w: u32, h: u32) @This() {
+    width: u16,
+    height: u16,
+    fn init(allocator: mem.Allocator, w: u16, h: u16) @This() {
         return @This(){
             .robots = std.ArrayList([2]vec2).init(allocator),
             .width = w,
@@ -60,26 +60,50 @@ const RobotMap = struct {
         return ret;
     }
 
-    fn part2(this: *const @This()) u32 {
+    fn part2(this: *const @This()) i64 {
         // idea: if an image is formed robots must be close to each other
         // make 10x10 buckets and metrics is sum of count per bucket ^ 2, find a threshold manually and print
-        var buckets = [_]u32{0} ** 121; // 11 x 11;
-        var metric: u64 = 0;
-        var count: u32 = 0;
-        while (metric < 7200) : (count += 1) { // do one iteration
+        // faster: the map is very small WxH so the x positions will cycle after W steps, and the y after H steps
+        // best bucket in 2d is likely to be a best bucket in 1d
+        var buckets = [_]u32{0} ** 26; // 13 is big enough to we can divide by 8,  2k is x, 2k+1 is y
+        var best_step: [2]usize = .{ 0, 0 };
+        var best_metric: [2]u64 = .{ 0, 0 };
+        for (1..1 + @max(this.height, this.width)) |step| {
             for (this.robots.items, 0..) |rob, i| {
                 const next_pos = this.move(rob, 1);
                 this.robots.items[i][0] = next_pos;
-                buckets[@intCast(@divTrunc(next_pos[0], 10) * 10 + @divTrunc(next_pos[1], 10))] += 1;
+                inline for (0..2) |k| {
+                    buckets[next_pos[k] / 8 * 2 + k] += 1;
+                }
             }
-            metric = 0;
-            for (buckets, 0..) |b, i| {
-                metric += b * b;
-                buckets[i] = 0; // reset
+            var metric: [2]u64 = .{ 0, 0 };
+            for (0..13) |j| {
+                inline for (0..2) |k| {
+                    const val = buckets[2 * j + k];
+                    metric[k] += val * val;
+                }
             }
+            inline for (0..2) |k| {
+                if (metric[k] > best_metric[k]) {
+                    best_metric[k] = metric[k];
+                    best_step[k] = step;
+                }
+            }
+            @memset(&buckets, 0);
         }
-        this.print();
-        return count;
+        // width and heigh are prime numbers
+        // X % width  = best_step[0]
+        // X % height = best_step[1]
+        const coefs = bezout(this.width, this.height);
+        const x: i64 = @intCast(best_step[1] * this.width);
+        const y: i64 = @intCast(best_step[0] * this.height);
+        return @mod(coefs[0] * x + coefs[1] * y, this.width * this.height);
+    }
+
+    fn bezout(a: i32, b: i32) [2]i32 {
+        if (a == 0) return .{ 0, 1 };
+        const res = bezout(@mod(b, a), a);
+        return .{ res[1] - @divTrunc(b, a) * res[0], res[0] };
     }
 
     fn move(this: *const @This(), robot: [2]vec2, steps: u32) vec2 {
