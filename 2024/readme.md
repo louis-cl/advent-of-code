@@ -208,6 +208,11 @@ Range (min … max):   162.9 µs … 1519.5 µs    9435 runs
 Time (mean ± σ):      31.2 ms ±   0.2 ms    [User: 26.7 ms, System: 4.3 ms]
 Range (min … max):    31.0 ms …  32.4 ms    95 runs
 ```
+**commit e72c8c8** use unsigned coordinates for positions and speed
+```
+Time (mean ± σ):      24.6 ms ±   0.2 ms    [User: 20.0 ms, System: 4.4 ms]
+Range (min … max):    24.4 ms …  25.9 ms    122 runs
+```
 
 ## Day 15
 **commit 4018a29**
