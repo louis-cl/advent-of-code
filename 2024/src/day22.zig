@@ -26,19 +26,22 @@ const Part2 = struct {
             nums[i] = 9 + new_digit - last_digit;
             last_digit = new_digit;
         }
-        this.record(nums, last_digit);
+        var last_z: usize = slot(nums);
+        this.record(last_z, last_digit);
         // loop the rest
         for (0..2000 - 4) |_| {
-            mem.rotate(u8, &nums, 1);
             last_secret = next(last_secret);
             const new_digit: u8 = @intCast(last_secret % 10);
-            nums[3] = 9 + new_digit - last_digit;
+            const new_val = 9 + new_digit - last_digit;
+            const t: usize = @intCast(nums[0]);
+            last_z = (last_z - t * 19 * 19 * 19) * 19 + new_val;
+            mem.rotate(u8, &nums, 1);
+            nums[3] = new_val;
             last_digit = new_digit;
-            this.record(nums, last_digit);
+            this.record(last_z, last_digit);
         }
     }
-    fn record(this: *@This(), nums: [4]u8, bananas: u32) void {
-        const z = slot(nums);
+    fn record(this: *@This(), z: usize, bananas: u32) void {
         if (!this.seen[z]) { // only the first time
             this.seen[z] = true;
             this.counter[z] += bananas;
