@@ -285,6 +285,11 @@ Range (min … max):     0.4 ms …   1.5 ms    3353 runs
 Time (mean ± σ):      26.9 ms ±   0.2 ms    [User: 26.3 ms, System: 0.4 ms]
 Range (min … max):    26.7 ms …  28.2 ms    111 runs
 ```
+**commit d87eeb3** use ids to save resetting boolean array (-5ms), better cast and rolling z (- <1ms)
+```
+Time (mean ± σ):      20.4 ms ±   0.8 ms    [User: 19.5 ms, System: 0.6 ms]
+Range (min … max):    18.5 ms …  28.4 ms    149 runs
+```
 
 ## Day 23
 **commit 736d58d** very slow implementation
