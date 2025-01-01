@@ -7,7 +7,7 @@ run:
 test:
 	$(ZIG_BUILD) day$(day)_test
 
-perf:
+bench:
 	$(ZIG_BUILD) day$(day)_install -Doptimize=ReleaseFast
 	hyperfine --shell=none --warmup 3 '$(EXECUTABLE_DIR)/day$(day)'
 
@@ -27,7 +27,7 @@ test_%:
 	$(MAKE) --no-print-directory test day=$*
 
 bench_%:
-	$(MAKE) --no-print-directory perf day=$*
+	$(MAKE) --no-print-directory bench day=$*
 
 perf_all:
 	$(ZIG_BUILD) all_install -Doptimize=ReleaseFast
