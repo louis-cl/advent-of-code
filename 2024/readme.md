@@ -115,6 +115,11 @@ Range (min … max): 59.6 ms … 67.8 ms (49 runs)
 Time (mean ± σ): 22.0 ms ± 0.3 ms [User: 21.4 ms, System: 0.4 ms]
 Range (min … max): 21.7 ms … 23.6 ms (138 runs)
 ```
+**commit 76fab28** precompute jumps around rocks
+```
+Time (mean ± σ):       8.5 ms ±   1.3 ms    [User: 7.9 ms, System: 0.3 ms]
+Range (min … max):     7.9 ms …  15.5 ms    373 runs
+```
 
 ## Day 7
 
