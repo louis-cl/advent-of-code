@@ -12,7 +12,7 @@ bench:
 	hyperfine --shell=none --warmup 3 '$(EXECUTABLE_DIR)/day$(day)'
 
 prof:
-	$(ZIG_BUILD) day$(day)_install -Doptimize=ReleaseFast
+	$(ZIG_BUILD) day$(day)_install -Doptimize=ReleaseSafe
 	valgrind --tool=callgrind $(EXECUTABLE_DIR)/day$(day) --callgrind-out-file callgrind.out
 	kcachegrind callgrind.out
 	@rm -f callgrind.out

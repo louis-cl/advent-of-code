@@ -14,9 +14,15 @@ const State = struct {
     fn next(self: *const State) State {
         return State{ .x = self.x + self.dx, .y = self.y + self.dy, .dx = self.dx, .dy = self.dy };
     }
+    fn back(self: *const State) State {
+        return State{ .x = self.x - self.dx, .y = self.y - self.dy, .dx = self.dx, .dy = self.dy };
+    }
     fn turn(self: *const State) State {
         // rotate 90 deg clockwise (or counter because my basis is wrongly oriented...)
         return State{ .x = self.x, .y = self.y, .dx = self.dy, .dy = -self.dx };
+    }
+    fn dist(self: *const State, other: State) u32 {
+        return @abs(self.x - other.x) + @abs(self.y - other.y);
     }
 };
 
@@ -65,7 +71,7 @@ pub fn solve(this: *const @This()) !Solution {
     }
     return Solution{
         .p1 = part1(map, start),
-        .p2 = part2(this.allocator, map, start),
+        .p2 = try part2(this.allocator, map, start),
         // .p2 = 0,
     };
 }
@@ -115,7 +121,7 @@ const Visited = struct {
 
     pub fn contains(self: *const Visited, state: State) bool {
         const cell = self.data[self.pos(state)];
-        return (cell & encode(state.dx, state.dy)) == 1;
+        return (cell & encode(state.dx, state.dy)) != 0;
     }
 
     pub fn put(self: *Visited, state: State) void {
@@ -127,11 +133,59 @@ const Visited = struct {
     }
 };
 
-fn part2(allocator: mem.Allocator, map: Map, start: State) u32 {
+const BlockJumping = struct {
+    next: std.AutoHashMap(State, State),
+
+    fn init(allocator: mem.Allocator, map: Map) !@This() {
+        var r = @This(){ .next = std.AutoHashMap(State, State).init(allocator) };
+        for (0..map.n) |i| {
+            for (0..map.n) |j| {
+                if (map.get(@intCast(i), @intCast(j)) == .block) {
+                    try r.process(map, i, j);
+                }
+            }
+        }
+        return r;
+    }
+
+    fn process(this: *@This(), map: Map, i: usize, j: usize) !void {
+        // there's a # at i,j
+        var state = State{ .x = @intCast(i), .y = @intCast(j), .dx = -1, .dy = 0 };
+        for (0..4) |_| { // for each direction
+            // std.debug.print("jump for rock at {any}\n", .{state});
+            // walk back to face the # and turn
+            var p = state.back().turn().next();
+            while (map.contains(p.x, p.y)) : (p = p.next()) {
+                if (map.get(p.x, p.y) == .block) {
+                    try this.next.put(state, p);
+                    // std.debug.print("\t found next at {any}\n", .{p});
+                    break;
+                }
+            }
+            state = state.turn();
+        }
+        // std.debug.print("\n", .{});
+    }
+
+    fn get(this: *const @This(), s: State) ?State {
+        return this.next.get(s);
+    }
+
+    fn deinit(this: *@This()) void {
+        this.next.deinit();
+    }
+};
+
+fn part2(allocator: mem.Allocator, map: Map, start: State) !u32 {
     var p = start;
-    var rocks = std.AutoHashMap([2]i32, void).init(allocator);
-    defer rocks.deinit();
-    var visited = Visited{ .data = allocator.alloc(u8, map.n * map.n) catch unreachable, .n = map.n };
+
+    var blocks = std.AutoHashMap([2]i32, void).init(allocator);
+    defer blocks.deinit();
+
+    var jumps = try BlockJumping.init(allocator, map);
+    defer jumps.deinit();
+
+    var visited = Visited{ .data = try allocator.alloc(u8, map.n * map.n), .n = map.n };
     defer allocator.free(visited.data);
     map.set(start.x, start.y, Cell.free); // prevent blocking the start
     while (true) {
@@ -141,11 +195,14 @@ fn part2(allocator: mem.Allocator, map: Map, start: State) u32 {
         switch (map.get(next.x, next.y)) {
             .block => p = p.turn(),
             .walked => { // try a rock
-                if (!rocks.contains(.{ next.x, next.y })) {
+                if (!blocks.contains(.{ next.x, next.y })) {
                     // std.debug.print("try rock at {d},{d}\n", .{ next.x, next.y });
                     map.set(next.x, next.y, Cell.block);
-                    if (cycles(&visited, map, p)) rocks.put(.{ next.x, next.y }, {}) catch unreachable;
                     visited.clearRetainingCapacity();
+                    if (cycles(&visited, jumps, map, next)) {
+                        // std.debug.print("block {any}\n", .{next});
+                        try blocks.put(.{ next.x, next.y }, {});
+                    }
                     map.set(next.x, next.y, Cell.free); // undo, mark free to not try again
                 }
                 p = next;
@@ -153,22 +210,75 @@ fn part2(allocator: mem.Allocator, map: Map, start: State) u32 {
             .free => p = next,
         }
     }
-    return rocks.count();
+    return blocks.count();
 }
 
-fn cycles(visited: *Visited, map: Map, start: State) bool {
-    var p = start;
-    while (!visited.contains(p)) {
-        // std.debug.print("\tCYCLE, guard at {d},{d}\n", .{ p.x, p.y });
-        visited.put(p);
-        const next = p.next();
-        if (!map.contains(next.x, next.y)) return false;
-        switch (map.get(next.x, next.y)) {
-            .block => p = p.turn(),
-            .free, .walked => p = next,
+const DEBUG = false;
+inline fn print(comptime fmt: []const u8, args: anytype) void {
+    if (DEBUG) std.debug.print(fmt, args);
+}
+
+fn cycles(visited: *Visited, jumps: BlockJumping, map: Map, start: State) bool {
+    // true if walking from start with a rock in start would cycle
+    const block = start;
+    print("cycles for block at {any}\n", .{block});
+    visited.put(block);
+    // walk until next block to start jumping
+    if (walk_until_block(map, start.back().turn())) |current| {
+        var p = current;
+        while (!visited.contains(p)) {
+            print("\tvisiting {any}\n", .{p});
+            visited.put(p);
+            // can't use the jumps if we are at the block
+            if (p.x == block.x and p.y == block.y) {
+                const b = p.back();
+                std.debug.assert(map.get(b.x, b.y) != .block);
+                if (walk_until_block(map, p.back().turn().next())) |next| {
+                    p = next;
+                } else {
+                    print("out after virtual block!\n", .{});
+                    return false; // no block, we are out
+                }
+            }
+            const next_block = hit_block(p, block);
+            const next_jump = jumps.get(p);
+            if (next_block != null and next_jump != null) {
+                // pick closest
+                if (next_block.?.dist(p) < next_jump.?.dist(p)) {
+                    p = next_block.?;
+                } else {
+                    p = next_jump.?;
+                }
+            } else if (next_block) |next| {
+                p = next;
+            } else if (next_jump) |next| {
+                p = next;
+            } else {
+                print("out!\n", .{});
+                return false; // out of map
+            }
         }
+        print("cycled at {any}!\n", .{p});
+        return true;
     }
-    return true;
+    print("out from the start!\n", .{});
+    return false; // out of the map
+}
+
+fn walk_until_block(map: Map, start: State) ?State {
+    var p = start;
+    while (map.contains(p.x, p.y)) : (p = p.next()) {
+        if (map.get(p.x, p.y) == .block) return p;
+    }
+    return null;
+}
+
+fn hit_block(current: State, block: State) ?State {
+    const p = current.back().turn();
+    // will walking forward from p hit block ?
+    if (std.math.order(block.x, p.x) != std.math.order(p.dx, 0) //
+    or std.math.order(block.y, p.y) != std.math.order(p.dy, 0)) return null;
+    return State{ .x = block.x, .y = block.y, .dx = p.dx, .dy = p.dy };
 }
 
 test "sample" {
