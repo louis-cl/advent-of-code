@@ -23,7 +23,7 @@ const Part2 = struct {
         var last_secret = s;
         for (0..4) |i| {
             last_secret = next(last_secret);
-            const new_digit: u8 = @as(u8, @intCast(last_secret)) % 10;
+            const new_digit: u8 = @as(u8, @truncate(last_secret)) % 10;
             nums[i] = 9 + new_digit - last_digit;
             last_digit = new_digit;
         }
@@ -32,7 +32,7 @@ const Part2 = struct {
         // loop the rest
         for (0..2000 - 4) |_| {
             last_secret = next(last_secret);
-            const new_digit: u8 = @as(u8, @intCast(last_secret)) % 10;
+            const new_digit: u8 = @as(u8, @truncate(last_secret)) % 10;
             const new_val = 9 + new_digit - last_digit;
             const t: usize = @intCast(nums[0]);
             last_z = (last_z - t * 19 * 19 * 19) * 19 + new_val;
