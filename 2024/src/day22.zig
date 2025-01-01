@@ -8,14 +8,15 @@ const Solution = struct { p1: u64, p2: u64 };
 
 const Part2 = struct {
     counter: []u32,
-    seen: []bool,
+    seen: []u16,
+    scan_id: u16 = 0,
     fn slot(nums: [4]u8) usize {
         var z: usize = 0;
         for (nums) |x| z = z * 19 + x;
         return z;
     }
     fn scan(this: *@This(), s: u24) void {
-        @memset(this.seen, false);
+        this.scan_id += 1;
         // initialize the first 4 numbers
         var nums: [4]u8 = undefined; // diffs + 9
         var last_digit: u8 = @intCast(s % 10);
@@ -42,8 +43,8 @@ const Part2 = struct {
         }
     }
     fn record(this: *@This(), z: usize, bananas: u32) void {
-        if (!this.seen[z]) { // only the first time
-            this.seen[z] = true;
+        if (this.seen[z] != this.scan_id) { // only the first time
+            this.seen[z] = this.scan_id;
             this.counter[z] += bananas;
         }
     }
@@ -58,9 +59,10 @@ pub fn solve(this: *const @This()) !Solution {
     // digit is in [0,9], diff in [-9,9] eq [0,18] => 19 values
     var part2 = Part2{
         .counter = try this.allocator.alloc(u32, 19 * 19 * 19 * 19), // TODO: check if faster on stack
-        .seen = try this.allocator.alloc(bool, 19 * 19 * 19 * 19),
+        .seen = try this.allocator.alloc(u16, 19 * 19 * 19 * 19),
     };
     @memset(part2.counter, 0);
+    @memset(part2.seen, 0);
     defer this.allocator.free(part2.counter);
     defer this.allocator.free(part2.seen);
 
