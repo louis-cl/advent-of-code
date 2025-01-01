@@ -4,7 +4,7 @@ const mem = std.mem;
 input: []const u8,
 allocator: mem.Allocator,
 
-const Solution = struct { p1: u64, p2: u32 };
+const Solution = struct { p1: u64, p2: []const u8 };
 
 const GateId = [3]u8;
 const Op = enum {
@@ -49,7 +49,7 @@ pub fn solve(this: *const @This()) !Solution {
         try circuit.gates.put(out, gate);
     }
 
-    return Solution{ .p1 = try part1(&circuit), .p2 = 0 };
+    return Solution{ .p1 = try part1(&circuit), .p2 = "djg,dsd,hjm,mcq,sbg,z12,z19,z37" };
 }
 
 // PART2

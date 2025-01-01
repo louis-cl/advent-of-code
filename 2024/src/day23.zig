@@ -4,7 +4,7 @@ const mem = std.mem;
 input: []const u8,
 allocator: mem.Allocator,
 
-const Solution = struct { p1: u32, p2: u32 };
+const Solution = struct { p1: u32, p2: []u8 };
 const MAX_VERTICES = 26 * 26; // 2 lowercase letter
 const NodeSet = std.AutoHashMap(usize, void);
 
@@ -45,10 +45,35 @@ pub fn solve(this: *const @This()) !Solution {
         try graph[left].put(right, {});
         try graph[right].put(left, {});
     }
+
     return Solution{
         .p1 = part1(graph), //
-        .p2 = try part2(graph),
+        .p2 = try part2(this.allocator, graph),
     };
+}
+
+fn lessThan(_: void, lhs: [2]u8, rhs: [2]u8) bool {
+    return std.mem.order(u8, &lhs, &rhs) == .lt;
+}
+
+fn part2(allocator: mem.Allocator, graph: []const NodeSet) ![]u8 {
+    var max = try MaxClique.find(graph);
+    defer max.best.deinit();
+
+    var names = try std.ArrayList([2]u8).initCapacity(allocator, max.best.count());
+    defer names.deinit();
+    var it = max.best.keyIterator();
+    while (it.next()) |v| names.appendAssumeCapacity(name(v.*));
+    std.mem.sort([2]u8, names.items, {}, lessThan);
+
+    var out = std.ArrayList(u8).init(allocator);
+    defer out.deinit();
+    for (names.items) |x| {
+        if (out.items.len != 0) try out.writer().writeByte(',');
+        try out.writer().writeAll(&x);
+    }
+
+    return try std.fmt.allocPrint(allocator, "{s}", .{out.items});
 }
 
 const MaxClique = struct {
@@ -99,17 +124,6 @@ const MaxClique = struct {
         return res;
     }
 };
-
-fn part2(graph: []const NodeSet) !u32 {
-    var max = try MaxClique.find(graph);
-    var it = max.best.keyIterator();
-    while (it.next()) |v| {
-        std.debug.print("max clique contains {s}\n", .{name(v.*)});
-    }
-    const res = max.best.count();
-    max.best.deinit();
-    return res;
-}
 
 fn part1(graph: []const NodeSet) u32 {
     const n = graph.len;
@@ -167,5 +181,6 @@ test "sample" {
     };
     const sol = try problem.solve();
     try std.testing.expectEqual(7, sol.p1);
-    try std.testing.expectEqual(4, sol.p2);
+    try std.testing.expectEqualSlices("co,de,ka,ta", sol.p2);
+    std.testing.allocator.free(sol.p2);
 }

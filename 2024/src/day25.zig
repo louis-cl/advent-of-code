@@ -4,7 +4,7 @@ const mem = std.mem;
 input: []const u8,
 allocator: mem.Allocator,
 
-const Solution = struct { p1: usize, p2: usize };
+const Solution = struct { p1: usize, p2: []const u8 };
 
 const vec5 = @Vector(5, u4);
 
@@ -41,7 +41,7 @@ pub fn solve(this: *const @This()) !Solution {
             if (@reduce(.And, check)) p1 += 1;
         }
     }
-    return Solution{ .p1 = p1, .p2 = 0 };
+    return Solution{ .p1 = p1, .p2 = "n/a" };
 }
 
 test "sample" {

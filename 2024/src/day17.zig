@@ -4,7 +4,7 @@ const mem = std.mem;
 input: []const u8,
 allocator: mem.Allocator,
 
-const Solution = struct { p1: std.ArrayList(i64), p2: i64 };
+const Solution = struct { p1: []u8, p2: i64 };
 
 const Program = struct {
     // instructions
@@ -56,14 +56,6 @@ const Program = struct {
         return out;
     }
 
-    pub fn run(this: *@This(), allocator: mem.Allocator) !std.ArrayList(i64) {
-        var output = std.ArrayList(i64).init(allocator);
-        while (!this.isHalted()) {
-            if (this.step()) |out| try output.append(out);
-        }
-        return output;
-    }
-
     pub fn nextOut(this: *@This()) i64 {
         while (!this.isHalted()) {
             if (this.step()) |out| return out;
@@ -87,7 +79,19 @@ pub fn solve(this: *const @This()) !Solution {
     };
     defer this.allocator.free(prog.instr);
     // std.debug.print("\n{any}\n", .{prog});
-    return Solution{ .p1 = try prog.run(this.allocator), .p2 = part2(&prog) };
+    return Solution{ .p1 = try part1(this.allocator, &prog), .p2 = part2(&prog) };
+}
+
+fn part1(allocator: mem.Allocator, prog: *Program) ![]u8 {
+    var output = std.ArrayList(u8).init(allocator);
+    defer output.deinit();
+    while (!prog.isHalted()) {
+        if (prog.step()) |out| {
+            if (output.items.len != 0) try output.writer().writeByte(',');
+            try output.writer().print("{d}", .{out});
+        }
+    }
+    return try std.fmt.allocPrint(allocator, "{s}", .{output.items});
 }
 
 fn readRegister(line: []const u8) !i64 {
@@ -153,8 +157,8 @@ test "sample" {
         .allocator = std.testing.allocator,
     };
     const sol = try problem.solve();
-    try std.testing.expectEqualSlices(i64, &[_]i64{ 4, 6, 3, 5, 6, 3, 5, 2, 1, 0 }, sol.p1.items);
-    defer sol.p1.deinit();
+    try std.testing.expectEqualStrings("4,6,3,5,6,3,5,2,1,0", sol.p1);
+    std.testing.allocator.free(sol.p1);
 }
 
 test "sample2" {
@@ -171,6 +175,6 @@ test "sample2" {
         .allocator = std.testing.allocator,
     };
     const sol = try problem.solve();
-    defer sol.p1.deinit();
+    std.testing.allocator.free(sol.p1);
     try std.testing.expectEqual(117440, sol.p2);
 }

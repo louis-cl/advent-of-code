@@ -23,6 +23,13 @@ table:
 run_%:
 	$(MAKE) --no-print-directory run day=$*
 
+run_all:
+	$(ZIG_BUILD) all_install -Doptimize=ReleaseFast
+	for i in $(shell seq 1 25); do \
+		echo "\033[1m=== Running Day $$i ===\033[0m"; \
+		./zig-out/bin/day$$i; \
+	done
+
 test_%:
 	$(MAKE) --no-print-directory test day=$*
 

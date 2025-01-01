@@ -4,7 +4,7 @@ const mem = std.mem;
 input: []const u8,
 allocator: mem.Allocator,
 
-const Solution = struct { p1: u32, p2: [2]i8 };
+const Solution = struct { p1: u32, p2: []u8 };
 const vec2 = @Vector(2, i8);
 
 const Grid = struct {
@@ -31,10 +31,9 @@ pub fn solve(this: *const @This()) !Solution {
     var grid = try parse(this.allocator, this.input, 71);
     defer this.allocator.free(grid.map);
     defer this.allocator.free(grid.dist);
-    return Solution{
-        .p1 = try part1(this.allocator, &grid, 1024), //
-        .p2 = try part2(this.allocator, &grid),
-    };
+    const p1 = try part1(this.allocator, &grid, 1024);
+    const p2 = try part2(this.allocator, &grid);
+    return Solution{ .p1 = p1, .p2 = try std.fmt.allocPrint(this.allocator, "{d},{d}", .{ p2[0], p2[1] }) };
 }
 
 fn parse(allocator: mem.Allocator, input: []const u8, grid_size: usize) !Grid {

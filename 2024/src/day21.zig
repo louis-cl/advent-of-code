@@ -14,7 +14,7 @@ pub fn solve(this: *const @This()) !Solution {
         if (line.len == 0) break;
         const len = digits(line, 2);
         const numeric = numericPart(line);
-        std.debug.print("for {s} len {d} and num {d}\n", .{ line, len, numeric });
+        // std.debug.print("for {s} len {d} and num {d}\n", .{ line, len, numeric });
         p1 += len * numeric;
         p2 += digits(line, 25) * numeric;
     }
