@@ -15,8 +15,6 @@ A makefile simplifies:
 - benchmarking: `make bench_1`
 - profiling: `make prof_1`
 
-Profiling is done with `-Doptimize=ReleaseSafe` otherwise most of the code gets inlined and we lose function information.
-
 Display benchmarks in a table with `python table.py` or `make table`.
 
 # Let's aim for performance
