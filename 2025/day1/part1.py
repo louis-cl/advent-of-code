@@ -1,6 +1,6 @@
 import sys
 
-def solve(data):
+def solve(lines):
     dial = 50
     count = 0
     for line in lines:

@@ -1,6 +1,6 @@
 import sys
 
-def solve(data):
+def solve(lines):
     dial = 50
     count = 0
     for line in lines:
@@ -8,7 +8,7 @@ def solve(data):
         mag = int(line[1:])
         # pre: dial is [0,99]
         q, new_dial = divmod(dial + sign * mag, 100)
-        print(f"from {dial} to {new_dial}: {abs(q)}")
+        # print(f"from {dial} to {new_dial}: {abs(q)}")
         
         count += abs(q) # loops
         # need to add landing on 0 exactly going left
