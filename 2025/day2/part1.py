@@ -1,31 +1,28 @@
 import sys
 
 
-def isInvalid(id):
-    n = len(id)
-    if n % 2 != 0: return False
+def is_invalid(s):
+    mid, rem = divmod(len(s), 2)
+    if rem != 0: return False
     # print("invalid", id[:n//2], id[n//2:])
-    return id[:n//2] == id[n//2:]
+    return s[:mid] == s[mid:]
 
 
-def sumInvalid(low, high):
-    sum = 0
+def invalids(low, high):
     for x in range(low, high+1):
-        if isInvalid(str(x)): sum += x
-    return sum
+        if is_invalid(str(x)): yield x
 
 
 def solve(line):
     total = 0
-    for range in line.split(','):
-        left, right = range.split('-')
-        total += sumInvalid(int(left), int(right))
+    for part in line.split(','):
+        low, high = map(int, part.split('-'))
+        total += sum(invalids(low, high))
     return total
 
 
 if __name__ == '__main__':
     with open(sys.argv[1], 'r') as f:
-        lines = f.readlines()
-    lines = list(map(lambda x: x.strip(), lines))
-    print(solve(lines[0]))
+        line = f.read().strip()
+    print(solve(line))
 
