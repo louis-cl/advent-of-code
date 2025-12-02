@@ -1,17 +1,8 @@
 import sys
 
 
-def is_periodic(s, period):
-    multiplier, rem = divmod(len(s), period)
-    if rem != 0: return False
-    return s == s[:period] * multiplier
-
-
 def is_invalid(s):
-    for period in range(1, len(s) // 2 + 1):
-        if is_periodic(s, period):
-            return True
-    return False
+    return s in (s + s)[1:-1]
 
 
 def invalids(low, high):
