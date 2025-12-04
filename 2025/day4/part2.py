@@ -19,16 +19,15 @@ def solve(grid):
         pos = remove(grid)
         if not pos: return total
         total += len(pos)
-        for p in pos:
-            del grid[p]
+        grid -= pos
 
 
 def parse(lines):
-    grid = {}
+    grid = set()
     for r, line in enumerate(lines):
         for c, char in enumerate(line.strip()):
             if char == '@':
-                grid[c + r*1j] = True
+                grid.add(c + r*1j)
     return grid
 
 
